@@ -1,0 +1,65 @@
+{
+  "version": 1,
+  "archiveSha256": "5f95db23d185473bb248c94d27394c3b7ccbfe48e53ad2d52768ef2695afbe2b",
+  "archiveSizeBytes": 3951497,
+  "members": [
+    {
+      "member": "temperate-forest-ecology-english-oak-mature-ac520af6.glb",
+      "sha256": "55a7ad92d83938e63078ac4c59705e991138aa2c4b9d23cc76c278a12f02cf75",
+      "sizeBytes": 106984
+    },
+    {
+      "member": "temperate-forest-ecology-scots-pine-mature-818bd1b5.glb",
+      "sha256": "7b153544ba7ccda96d5b48f41b8d25cb44afb98a55c936709286f03a2905f581",
+      "sizeBytes": 100784
+    }
+  ],
+  "dependencyCoverage": "glb-gltf-obj-mtl-textureatlas-bmfont-tiled",
+  "limitations": [],
+  "modelRequirements": [
+    {
+      "member": "temperate-forest-ecology-english-oak-mature-ac520af6.glb",
+      "requiredExtensions": [
+        "KHR_mesh_quantization"
+      ]
+    },
+    {
+      "member": "temperate-forest-ecology-scots-pine-mature-818bd1b5.glb",
+      "requiredExtensions": [
+        "KHR_mesh_quantization"
+      ]
+    }
+  ],
+  "catalogSources": [
+    {
+      "snapshotId": "catalog-20260924-japan-characters-scene-removal-v1",
+      "catalogPath": "3d-models/cross-category/3dassets-temperate-forest-ecology/assets.zip"
+    }
+  ],
+  "catalogMetadata": [
+    {
+      "snapshotId": "catalog-20260924-japan-characters-scene-removal-v1",
+      "catalogPath": "3d-models/cross-category/3dassets-temperate-forest-ecology/assets.zip",
+      "metadataPath": "3d-models/cross-category/3dassets-temperate-forest-ecology/metadata.json",
+      "metadataSha256": "d4b887b1a0229e0ade489d4e75ccaa5898a4765927abb81968369fd1886153fe",
+      "archiveSha256": "5f95db23d185473bb248c94d27394c3b7ccbfe48e53ad2d52768ef2695afbe2b",
+      "source": {
+        "packId": "3dassets:temperate-forest-ecology",
+        "name": "Forest Trees and Woodland Plants",
+        "url": "https://3dassets.dev/packs/temperate-forest-ecology",
+        "metadataPath": "3d-models/cross-category/3dassets-temperate-forest-ecology/metadata.json",
+        "metadataSha256": "sha256:d4b887b1a0229e0ade489d4e75ccaa5898a4765927abb81968369fd1886153fe"
+      },
+      "license": {
+        "id": "CC0-1.0",
+        "attributionRequired": false,
+        "copyrightNoticeRequired": false,
+        "licenseNoticeRequired": false,
+        "modificationNoticeRequired": false,
+        "commercialUseAllowed": true,
+        "editableProjectDistributionAllowed": true,
+        "reusableTemplateDistributionAllowed": true
+      }
+    }
+  ]
+}
