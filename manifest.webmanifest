@@ -1,0 +1,12 @@
+{
+  "name": "Gertrudes Greinwald privater Garten",
+  "short_name": "Gertrudes Greinwald privater Garten",
+  "id": "com.example.gamename",
+  "description": "A 3D platformer in a valley made with a 3D terrain: paths around hills, platforms on their tops, coins to collect and a pond.",
+  "orientation": "landscape",
+  "start_url": "./index.html",
+  "display": "standalone",
+  "background_color": "black",
+  "categories": ["games", "entertainment"],
+  "icons": []
+}
