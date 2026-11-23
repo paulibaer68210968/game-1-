@@ -27,9 +27,10 @@ const save = readSave();
 let world;
 let match3 = null;
 let placementKey = null;
-let cameraYaw = Math.PI * 0.22;
-let cameraPitch = 0.28;
-let cameraDistance = 8.2;
+let cameraYaw = Math.PI * 0.25;
+let cameraPitch = 0.76;
+let cameraDistance = 32;
+let cameraZoom = 1;
 let pointerLook = null;
 let lastInteract = 0;
 let lastSaveToast = 0;
@@ -65,9 +66,9 @@ renderer.toneMapping = THREE.ACESFilmicToneMapping;
 renderer.toneMappingExposure = 1.08;
 
 const scene = new THREE.Scene();
-const camera = new THREE.PerspectiveCamera(56, innerWidth / innerHeight, 0.08, 240);
+const camera = new THREE.OrthographicCamera(-12, 12, 12, -12, 0.1, 320);
 camera.up.set(0, 0, 1);
-camera.position.set(5, -8, 5);
+camera.zoom = cameraZoom;
 
 const loader = new GLTFLoader();
 const ui = createUI({ root: uiRoot, language: save.language, callbacks: {
@@ -290,11 +291,17 @@ function updatePlayer(dt) {
 
 function onResize() {
   camera.aspect = innerWidth / innerHeight;
+  const viewHeight = 16;
+  camera.left = -viewHeight * camera.aspect * 0.5;
+  camera.right = viewHeight * camera.aspect * 0.5;
+  camera.top = viewHeight * 0.5;
+  camera.bottom = -viewHeight * 0.5;
   camera.updateProjectionMatrix();
   renderer.setPixelRatio(Math.min(devicePixelRatio || 1, 1.8));
   renderer.setSize(innerWidth, innerHeight, false);
 }
 
+onResize();
 window.addEventListener('resize', onResize);
 window.addEventListener('keydown', (event) => {
   if (event.code === 'Escape') {
@@ -329,10 +336,14 @@ canvas.addEventListener('pointermove', (event) => {
   pointerLook.x = event.clientX;
   pointerLook.y = event.clientY;
   cameraYaw -= dx * 0.006;
-  cameraPitch = THREE.MathUtils.clamp(cameraPitch + dy * 0.004, -0.12, 0.85);
+  cameraPitch = THREE.MathUtils.clamp(cameraPitch + dy * 0.004, 0.52, 1.08);
 });
 canvas.addEventListener('pointerup', () => { pointerLook = null; });
-canvas.addEventListener('wheel', (event) => { cameraDistance = THREE.MathUtils.clamp(cameraDistance + event.deltaY * 0.004, 5, 13); }, { passive: true });
+canvas.addEventListener('wheel', (event) => {
+  cameraZoom = THREE.MathUtils.clamp(cameraZoom - event.deltaY * 0.001, 0.72, 1.55);
+  camera.zoom = cameraZoom;
+  camera.updateProjectionMatrix();
+}, { passive: true });
 canvas.addEventListener('dblclick', interact);
 
 function frame() {

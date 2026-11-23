@@ -28,3 +28,9 @@
 - Der Nutzer bat: „Füge dem Wichtel eine einfache Laufanimation oder Wackel-Animation hinzu, wenn er sich bewegt.“
 - Eine dezente Wipp-/Seitbewegung läuft nur bei geerdeter Bewegung, beruhigt sich im Stillstand und ist keine Laufanimation während eines Sprungs.
 - Die Bewegung verändert nur das sichtbare Modell, nie Physik-/Kamerawurzel oder Kollisionsdaten.
+
+## 6. Gemütliche isometrische Gartengestaltung nach Referenz
+- Der Nutzer bat: „kann's du das Spiel in dieser Art erstellen?“; die neu angehängte Referenz zeigt eine gemütliche, detailreiche isometrische Gartenansicht mit gepflasterten Wegen, üppigen Beeten, dekorativen Objekten und sichtbarer Design-/Auswahloberfläche.
+- Gestalte die bestehende Three.js-Gartenwelt in dieser visuellen Richtung: feste orthografische Isometrie, warme Storybook-Farbwelt, lesbare Wege/Beete und auffindbare Dekorationen; nutze das Bild als Stilhinweis, ohne fremde Figuren, Anordnung oder konkrete UI zu kopieren.
+- Zeige eine klar erkennbare Marken-/Statusoberfläche sowie eine Dekorationsauswahl; Shop, Kosten, Platzieren und Touch-Steuerung bleiben nutzbar.
+- Erhalte Gartenwichtel, Bewegung, Münzen, Shop/Restaurierungen, Speicherung, Deutsch/Brasilianisches Portugiesisch und Match‑3 aus dem bestehenden Spiel.

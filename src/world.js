@@ -205,23 +205,71 @@ export async function createWorld(THREE, { scene, data, scatterData, loader, ass
     geometry.computeVertexNormals();
     const dirt = assetTexture(terrain.layers[1].texture, 6, true);
     const normal = assetTexture(terrain.layers[1].normalMap, 6, false);
-    const path = new THREE.Mesh(geometry, new THREE.MeshStandardMaterial({ map: dirt, normalMap: normal, color: 0xd8c3a0, roughness: 1, polygonOffset: true, polygonOffsetFactor: -1 }));
+    const path = new THREE.Mesh(geometry, new THREE.MeshStandardMaterial({ map: dirt, normalMap: normal, color: 0xe0caa4, roughness: 1, polygonOffset: true, polygonOffsetFactor: -1 }));
     path.receiveShadow = true;
     scene.add(path);
   }
 
+  function addPathPavers() {
+    const tiles = [];
+    const random = seededRandom(811);
+    const palette = [0xb9aa8b, 0xcbbb9c, 0xa99d82, 0xd4c5a5, 0xc3b391];
+    for (const edit of terrain.edits) {
+      if (edit.operation !== 'paint' || edit.paintLayer !== 2 || !edit.path?.length) continue;
+      const halfWidth = Math.max(0.42, edit.radius * width * 0.54);
+      const laneCount = Math.max(1, Math.floor((halfWidth * 2) / 0.55));
+      for (let i = 1; i < edit.path.length; i += 1) {
+        const a = edit.path[i - 1];
+        const b = edit.path[i];
+        const ax = minX + a[0] * width;
+        const ay = minY + a[1] * depth;
+        const bx = minX + b[0] * width;
+        const by = minY + b[1] * depth;
+        const dx = bx - ax;
+        const dy = by - ay;
+        const length = Math.hypot(dx, dy);
+        if (length < 0.04) continue;
+        const steps = Math.max(1, Math.ceil(length / 0.62));
+        const nx = -dy / length;
+        const ny = dx / length;
+        for (let lane = 0; lane < laneCount; lane += 1) {
+          const side = (lane - (laneCount - 1) / 2) * 0.53;
+          for (let step = 0; step < steps; step += 1) {
+            const t = (step + 0.5 + (random() - 0.5) * 0.12) / steps;
+            const x = ax + dx * t + nx * (side + (random() - 0.5) * 0.09);
+            const y = ay + dy * t + ny * (side + (random() - 0.5) * 0.09);
+            tiles.push({ x, y, angle: Math.atan2(dy, dx) + (random() - 0.5) * 0.15, color: palette[Math.floor(random() * palette.length)], scale: 0.88 + random() * 0.2 });
+          }
+        }
+      }
+    }
+    if (!tiles.length) return;
+    const geometry = new THREE.CylinderGeometry(0.31, 0.31, 0.075, 6, 1);
+    geometry.rotateX(Math.PI / 2);
+    const material = new THREE.MeshStandardMaterial({ color: 0xffffff, roughness: 0.94, flatShading: true });
+    const stones = new THREE.InstancedMesh(geometry, material, tiles.length);
+    const dummy = new THREE.Object3D();
+    tiles.forEach((tile, index) => {
+      dummy.position.set(tile.x, tile.y, heightAt(tile.x, tile.y) + 0.07);
+      dummy.rotation.set(0, 0, tile.angle);
+      dummy.scale.set(tile.scale, tile.scale * (0.91 + random() * 0.1), 1);
+      dummy.updateMatrix();
+      stones.setMatrixAt(index, dummy.matrix);
+      stones.setColorAt(index, new THREE.Color(tile.color));
+    });
+    stones.instanceMatrix.needsUpdate = true;
+    if (stones.instanceColor) stones.instanceColor.needsUpdate = true;
+    stones.receiveShadow = true;
+    scene.add(stones);
+  }
+
   function addSkyAndLights() {
-    scene.background = new THREE.Color(0xa7d2bc);
-    scene.fog = new THREE.Fog(0xc4d9b5, 58, 150);
-    const skyFiles = ['Skybox_Right.png', 'Skybox_Left.png', 'Skybox_Top.png', 'Skybox_Bottom.png', 'Skybox_Front.png', 'Skybox_Back.png'];
-    new THREE.CubeTextureLoader().load(skyFiles.map(assetUrl), (cube) => {
-      cube.colorSpace = THREE.SRGBColorSpace;
-      scene.background = cube;
-    }, undefined, () => {});
-    const hemi = new THREE.HemisphereLight(0xe8f7ff, 0x566447, 1.75);
+    scene.background = new THREE.Color(0xb8d0ad);
+    scene.fog = new THREE.Fog(0xd2dfb6, 58, 150);
+    const hemi = new THREE.HemisphereLight(0xfff5e2, 0x66714a, 1.85);
     hemi.position.set(0, 0, 50);
     scene.add(hemi);
-    const sun = new THREE.DirectionalLight(0xffe4b4, 2.2);
+    const sun = new THREE.DirectionalLight(0xffe8bf, 2.35);
     sun.position.set(-28, -22, 46);
     sun.castShadow = true;
     sun.shadow.mapSize.set(2048, 2048);
@@ -342,6 +390,70 @@ export async function createWorld(THREE, { scene, data, scatterData, loader, ass
     }
   }
 
+  function addGardenBeds() {
+    const center = toWorld(data.playerStart.position);
+    const random = seededRandom(9341);
+    const soil = new THREE.MeshStandardMaterial({ color: 0x806a48, roughness: 1 });
+    const border = new THREE.MeshStandardMaterial({ color: 0xb7a687, roughness: 0.94, flatShading: true });
+    const stemMaterial = new THREE.MeshStandardMaterial({ color: 0x557a46, roughness: 0.9 });
+    const petalMaterials = [0xe8868f, 0xd8a6d6, 0xf1d36e, 0xfff0cc, 0xb58bd2].map((color) => new THREE.MeshStandardMaterial({ color, roughness: 0.82 }));
+    const leafMaterial = new THREE.MeshStandardMaterial({ color: 0x83a65e, roughness: 0.9 });
+    const soilGeometry = new THREE.CircleGeometry(1, 20);
+    const stoneGeometry = new THREE.DodecahedronGeometry(0.15, 0);
+    const stemGeometry = new THREE.CylinderGeometry(0.022, 0.03, 0.34, 5);
+    stemGeometry.rotateX(Math.PI / 2);
+    const leafGeometry = new THREE.SphereGeometry(0.11, 6, 4);
+    const petalGeometry = new THREE.SphereGeometry(0.105, 7, 5);
+    const centerGeometry = new THREE.SphereGeometry(0.06, 7, 5);
+    const spots = [[-4.3, 2.4], [4.6, 2.8], [-5.1, -1.8], [4.8, -2.6], [-2.1, -5.7], [1.2, 5.8], [6.4, 0.4], [-6.1, 1.0]];
+    const pathEdits = terrain.edits.filter((edit) => edit.operation === 'paint' && edit.paintLayer === 2 && edit.path?.length > 1);
+    for (const [offsetX, offsetY] of spots) {
+      const x = center.x + offsetX;
+      const y = center.y + offsetY;
+      const uv = toUV(x, y);
+      const nearPath = pathEdits.some((edit) => edit.path.slice(1).some((point, index) => pointSegmentDistance(uv, edit.path[index], point) < 0.014));
+      if (nearPath) continue;
+      const z = heightAt(x, y);
+      const rx = 0.8 + random() * 0.22;
+      const ry = 0.54 + random() * 0.16;
+      const bed = new THREE.Mesh(soilGeometry, soil);
+      bed.position.set(x, y, z + 0.045);
+      bed.scale.set(rx, ry, 1);
+      scene.add(bed);
+      for (let i = 0; i < 9; i += 1) {
+        const angle = (i / 9) * TAU;
+        const stone = new THREE.Mesh(stoneGeometry, border);
+        stone.position.set(x + Math.cos(angle) * rx * 0.96, y + Math.sin(angle) * ry * 0.96, z + 0.105);
+        stone.scale.set(0.8 + random() * 0.55, 0.8 + random() * 0.55, 0.42 + random() * 0.28);
+        stone.rotation.z = random() * TAU;
+        scene.add(stone);
+      }
+      for (let i = 0, count = 5 + Math.floor(random() * 3); i < count; i += 1) {
+        const fx = x + (random() * 2 - 1) * rx * 0.68;
+        const fy = y + (random() * 2 - 1) * ry * 0.64;
+        const fz = heightAt(fx, fy);
+        const stem = new THREE.Mesh(stemGeometry, stemMaterial);
+        stem.position.set(fx, fy, fz + 0.2);
+        scene.add(stem);
+        const leaf = new THREE.Mesh(leafGeometry, leafMaterial);
+        leaf.position.set(fx + (random() - 0.5) * 0.2, fy + (random() - 0.5) * 0.22, fz + 0.18);
+        leaf.scale.set(1.2, 0.55, 0.42);
+        scene.add(leaf);
+        const petals = petalMaterials[Math.floor(random() * petalMaterials.length)];
+        for (let petal = 0; petal < 5; petal += 1) {
+          const angle = (petal / 5) * TAU;
+          const bloom = new THREE.Mesh(petalGeometry, petals);
+          bloom.position.set(fx + Math.cos(angle) * 0.085, fy + Math.sin(angle) * 0.085, fz + 0.39);
+          bloom.scale.set(0.82, 0.68, 0.62);
+          scene.add(bloom);
+        }
+        const heart = new THREE.Mesh(centerGeometry, petalMaterials[2]);
+        heart.position.set(fx, fy, fz + 0.41);
+        scene.add(heart);
+      }
+    }
+  }
+
   function insideScatterEdits(config, u, v) {
     if (config.coverage !== 'Painted') return true;
     let active = false;
@@ -355,14 +467,17 @@ export async function createWorld(THREE, { scene, data, scatterData, loader, ass
 
   async function addScatter() {
     const area = width * depth;
+    const playerStartX = data.playerStart.position.x * scale;
+    const playerStartY = data.playerStart.position.y * scale;
     for (const [kind, config] of Object.entries(scatterData)) {
+      const isTree = kind === 'oaks' || kind === 'pines';
       onStatus(`Der Garten bekommt ${kind === 'oaks' || kind === 'pines' ? 'Bäume' : 'kleine Details'} …`);
       let template;
       try { template = await getTemplate(config.model); }
       catch (error) { console.warn(`Could not load scatter model ${config.model}`, error); continue; }
       const random = seededRandom(config.seed || 1);
       const desired = Math.round(Math.min(120, area * config.density * (kind === 'oaks' || kind === 'pines' ? 0.19 : 0.105)));
-      const targetSize = config.size * scale * ((kind === 'oaks' || kind === 'pines') ? 1.65 : 0.95);
+      const targetSize = config.size * scale * (isTree ? 0.92 : 0.95);
       const scatterScale = Math.max(0.001, targetSize / 4);
       let placed = 0;
       let attempts = 0;
@@ -373,7 +488,7 @@ export async function createWorld(THREE, { scene, data, scatterData, loader, ass
         if (!insideScatterEdits(config, u, v)) continue;
         const x = minX + u * width;
         const y = minY + v * depth;
-        if (Math.hypot(x, y - 18) < 4.2) continue;
+        if (Math.hypot(x - playerStartX, y - playerStartY) < (isTree ? 12 : 4.2)) continue;
         const root = new THREE.Group();
         const upright = new THREE.Group();
         upright.rotation.x = Math.PI / 2;
@@ -394,8 +509,10 @@ export async function createWorld(THREE, { scene, data, scatterData, loader, ass
   addSkyAndLights();
   buildTerrain();
   addPaintedPaths();
+  addPathPavers();
   const water = addWater();
   addSceneryStones();
+  addGardenBeds();
   addWallColliders();
   const pushableBox = addPushableBox();
 

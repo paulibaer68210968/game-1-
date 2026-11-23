@@ -33,6 +33,10 @@ export function createUI({ root, language = 'de', callbacks = {} }) {
   const text = () => TEXT[locale];
 
   root.innerHTML = `
+    <div class="brand-sign" aria-label="Gertrudes Greinwald privater Garten">
+      <span class="brand-flower" aria-hidden="true">✿</span>
+      <span class="brand-copy"><strong>Gertrudes Greinwald</strong><small>privater Garten</small></span>
+    </div>
     <div id="topHud">
       <div class="ui-panel hud-stat" id="starsStat">✦ <span id="starsValue">0</span> <small></small></div>
       <div class="ui-panel hud-stat" id="levelStat">✿ <span id="levelValue">1</span> <small></small></div>
@@ -43,6 +47,7 @@ export function createUI({ root, language = 'de', callbacks = {} }) {
       <button class="game-button" id="controlModeButton" type="button"></button>
       <button class="game-button" id="languageButton" type="button" aria-label="Sprache umschalten">DE / PT</button>
     </div>
+    <nav class="garden-tray" id="gardenTray" aria-label="Gartendekoration auswählen"></nav>
     <div class="ui-panel" id="interactionPrompt" aria-live="polite"></div>
     <div class="ui-panel" id="toast" role="status" aria-live="polite"></div>
     <section class="ui-panel" id="shopPanel" hidden>
@@ -71,6 +76,25 @@ export function createUI({ root, language = 'de', callbacks = {} }) {
     $('#levelStat small').textContent = text().level;
     $('#coinStat small').textContent = text().coins;
     renderShop();
+    renderTray();
+  }
+
+  function renderTray() {
+    const tray = $('#gardenTray');
+    if (!tray) return;
+    const prices = { flowerBed: 2, statue: 4, lantern: 3, gnome: 1 };
+    const icons = { flowerBed: '❀', statue: '♙', lantern: '♨', gnome: '♧' };
+    tray.replaceChildren();
+    for (const [key, [name]] of Object.entries(text().items)) {
+      const button = document.createElement('button');
+      button.type = 'button';
+      button.className = 'tray-item';
+      button.disabled = currentStats.stars < prices[key];
+      button.setAttribute('aria-label', `${name} · ${prices[key]} ${text().stars}`);
+      button.innerHTML = `<span class="tray-icon" aria-hidden="true">${icons[key]}</span><span class="tray-copy"><b>${name}</b><small>✦ ${prices[key]}</small></span>`;
+      button.addEventListener('click', () => callbacks.onBuy?.(key, prices[key]));
+      tray.appendChild(button);
+    }
   }
 
   function renderShop() {
@@ -118,6 +142,7 @@ export function createUI({ root, language = 'de', callbacks = {} }) {
 
   function setTouchControls(visible) {
     touchVisible = Boolean(visible);
+    root.classList.toggle('is-touch', touchVisible);
     $('#touchControls').classList.toggle('is-visible', touchVisible);
     renderShop();
   }
