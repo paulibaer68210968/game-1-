@@ -15,7 +15,7 @@ Das Build erzeugt `game.bundle.js`, `game.bundle.css` sowie gehashte Dateien fü
 
 ## Steuerung
 
-- Desktop: WASD oder Pfeiltasten bewegen, Leertaste springen, E interagieren, B öffnet den Laden. Ziehen mit Maus oder Touch dreht die Third-Person-Kamera; das Mausrad verändert den Abstand.
+- Desktop: WASD oder Pfeiltasten bewegen, Leertaste springen, E interagieren, B öffnet den Laden. Die isometrische Kamera folgt dem Wichtel; Ziehen mit Maus oder Touch dreht sie, das Mausrad zoomt.
 - Touch: virtueller Joystick, Aktionstaste und Sprungtaste. Über den Schalter oben rechts lässt sich der Touch-Steuerungsmodus auch auf anderen Geräten aktivieren.
 - Am Gartenschild startet das 8×8-Match-3. Erfolgreiche Rätsel bringen Sterne; Brunnen, Bank und Gartendekorationen können mit Sternen restauriert bzw. gekauft werden.
 
@@ -24,7 +24,7 @@ Sprache (Deutsch oder brasilianisches Portugiesisch), gesammelte Münzen, Rätse
 ## Projektstruktur
 
 - `src/main.js`: Renderer, Eingabe, Kamera, Spielfortschritt und Zusammensetzen der Module.
-- `src/world.js`: Terrain, Skybox, Objekte, Kollisionen und dekorative Vegetation.
+- `src/world.js`: Terrain, Pflasterwege, Blumenbeete, Gartenobjekte, Kollisionen und dekorative Vegetation.
 - `src/ui.js`: HUD, Shop, Sprache und Touch-Steuerung.
 - `src/match3.js` / `src/match3.css`: unabhängiges Match-3-Minispiel.
 - `src/data/gardenData.js`: neutrales Gartenlayout und Streuparameter.

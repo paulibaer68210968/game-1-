@@ -34,7 +34,7 @@ Die Wichtelfigur erhält weiterhin eine weiche Laufwippe nur während geerdeter 
 
 ## Zu erhaltende Spielinhalte
 
-1. **3D-Garten:** das Garten-Terrain mit Gras-/Weg-/Fels-/Sand-Charakter, Wasserfläche, Skybox und Licht; der Gartenwichtel als Spielfigur; Brunnen, Bank, Schild, Garten-Dekoration, Vegetationsstreuung, vier Markierungsflaggen, 45 Münzen, Hindernisse und Kartengrenzen. Die Ausgangsanordnung und Münzpositionen werden aus dem Export in neutrale Laufzeitdaten übertragen.
+1. **3D-Garten:** das Garten-Terrain mit Gras-/Weg-/Fels-/Sand-Charakter, Wasserfläche, hellem Gartenhintergrund und warmem Licht; gepflasterte Wege und ergänzte Blumenbeete; der Gartenwichtel als Spielfigur; Brunnen, Bank, Schild, Garten-Dekoration, Vegetationsstreuung, vier Markierungsflaggen, 45 Münzen, Hindernisse und Kartengrenzen. Die Ausgangsanordnung und Münzpositionen werden aus dem Export in neutrale Laufzeitdaten übertragen.
 2. **Steuerung:** Desktop mit WASD und Leertaste zum Springen, Touch mit virtuellem Joystick und Sprungtaste, Umschalter zwischen Steuerungsarten, sowie isometrische Orthografiekamera, die dem Wichtel folgt und per Maus-/Touchbedienung begrenzt dreh- und zoombar bleibt.
 3. **Gartenmechaniken:** Münzen sammeln und Sound abspielen; Schild öffnet Match-3; Sterne und Gartenlevel im HUD; Brunnen und Bank mit Sternen restaurieren; Stern-Shop für Beet, Statue, Laterne und Gnom; gekaufte Objekte per Boden-Raycaster platzieren. Sprache Deutsch/Brasilianisches Portugiesisch und Spielstand bleiben im Browser gespeichert.
 4. **Match-3:** 8×8-Feld mit fünf Farben, Tausch benachbarter Steine, Match-Auflösung/Kaskaden und Nachrücken, Ziel-/Zugzähler, Level-Farbfolge, Sternbelohnung, Erfolg/Niederlage und Rückkehr in den Garten.
