@@ -6,12 +6,11 @@ const COLOR_LABELS = {
   'pt-BR': { Red: 'Vermelho', Blue: 'Azul', Green: 'Verde', Yellow: 'Amarelo', Purple: 'Roxo' },
 };
 const TARGET_BY_LEVEL = ['Red', 'Blue', 'Green', 'Yellow', 'Purple'];
-
-// The original 64 tile instances, read row-by-row from the exported grid coordinates.
-// This layout has no matches at startup.
+const SPECIAL_SYMBOLS = { row: '↔', column: '↕', bomb: '✿', rainbow: '✧' };
+// No automatic opening match; row 1, column 5 can swap with row 2, column 5 to form four blues.
 const ORIGINAL_BOARD = [
   ['Green', 'Green', 'Blue', 'Blue', 'Yellow', 'Blue', 'Purple', 'Yellow'],
-  ['Yellow', 'Purple', 'Blue', 'Yellow', 'Red', 'Red', 'Green', 'Red'],
+  ['Yellow', 'Purple', 'Blue', 'Yellow', 'Blue', 'Red', 'Green', 'Red'],
   ['Purple', 'Yellow', 'Yellow', 'Purple', 'Blue', 'Purple', 'Purple', 'Yellow'],
   ['Red', 'Green', 'Green', 'Blue', 'Green', 'Red', 'Yellow', 'Green'],
   ['Blue', 'Yellow', 'Purple', 'Purple', 'Blue', 'Red', 'Red', 'Purple'],
@@ -22,49 +21,69 @@ const ORIGINAL_BOARD = [
 
 const TEXT = {
   de: {
-    title: 'Edelstein-Garten', subtitle: 'Tausche Steine und sammle deine Zielfarbe!',
-    back: 'Zurück', moves: 'Züge', goal: 'Ziel', collected: 'Gesammelt',
-    hint: 'Wähle zwei benachbarte Steine zum Tauschen.',
+    levelLabel: 'Level',
+    title: 'Edelstein-Garten', subtitle: 'Vierer, Fünfer und Ecken formen Spezialsteine. Tausche benachbarte Steine per Tipp oder Wisch.',
+    back: 'Zurück', moves: 'Züge', goal: 'Ziel', collected: 'Gesammelt', hint: 'Wähle zwei benachbarte Steine zum Tauschen.',
     selected: (color, row, col) => `${color}, Reihe ${row}, Spalte ${col} ausgewählt. Wähle einen benachbarten Stein.`,
     invalid: 'Dort entsteht keine Reihe – der Tausch wurde zurückgesetzt.',
     win: 'Wunderbar! Das Gartenziel ist erreicht!', lose: 'Keine Züge mehr. Versuche es noch einmal!',
-    colors: COLOR_LABELS.de,
+    colors: COLOR_LABELS.de, powersTitle: 'Spezialsteine', boostersTitle: 'Garten-Booster',
+    powerNames: { row: 'Zeilenrakete', column: 'Spaltenrakete', bomb: 'Blumenbombe', rainbow: 'Regenbogenstein' },
+    powerHints: { row: 'räumt eine ganze Zeile', column: 'räumt eine ganze Spalte', bomb: 'räumt das Feld rundherum', rainbow: 'räumt Steine einer Farbe' },
+    shovel: 'Gartenschaufel', watering: 'Gießkanne', uses: (count) => `${count} übrig`,
+    shovelReady: 'Schaufel: Tippe ein Feld zum Entfernen.', wateringReady: 'Gießkanne: Tippe ein Feld für eine 3×3-Fläche.',
+    shovelUsed: 'Ein Stein wurde mit der Schaufel entfernt.', wateringUsed: 'Die Gießkanne hat ein 3×3-Feld freigeräumt.', boosterCancel: 'Booster abgewählt. Wähle zwei benachbarte Steine.',
+    specialCreated: (name) => `${name} gebildet! Beim Auslösen kann sie weitere Steine mitreißen.`,
+    specialActivated: 'Spezialstein ausgelöst – die Kettenreaktion läuft!', noMovesBoosters: 'Keine Züge mehr – setze deine verbleibenden Booster ein!',
   },
   'pt-BR': {
-    title: 'Jardim de Gemas', subtitle: 'Troque as pedras e colete a cor do objetivo!',
-    back: 'Voltar', moves: 'Jogadas', goal: 'Meta', collected: 'Coletadas',
-    hint: 'Escolha duas pedras vizinhas para trocar.',
+    levelLabel: 'Nível',
+    title: 'Jardim de Gemas', subtitle: 'Sequências de 4, 5 e cruzamentos criam gemas especiais. Toque ou deslize para trocar pedras vizinhas.',
+    back: 'Voltar', moves: 'Jogadas', goal: 'Meta', collected: 'Coletadas', hint: 'Escolha duas pedras vizinhas para trocar.',
     selected: (color, row, col) => `${color}, linha ${row}, coluna ${col} selecionada. Escolha uma pedra vizinha.`,
     invalid: 'Essa troca não formou uma sequência e foi desfeita.',
     win: 'Maravilha! Você alcançou a meta do jardim!', lose: 'As jogadas acabaram. Tente novamente!',
-    colors: COLOR_LABELS['pt-BR'],
+    colors: COLOR_LABELS['pt-BR'], powersTitle: 'Gemas especiais', boostersTitle: 'Impulsos do jardim',
+    powerNames: { row: 'Foguete horizontal', column: 'Foguete vertical', bomb: 'Bomba de flores', rainbow: 'Gema arco-íris' },
+    powerHints: { row: 'limpa uma linha inteira', column: 'limpa uma coluna inteira', bomb: 'limpa as pedras ao redor', rainbow: 'limpa pedras de uma cor' },
+    shovel: 'Pá de jardim', watering: 'Regador', uses: (count) => `${count} restante(s)`,
+    shovelReady: 'Pá: toque em uma pedra para removê-la.', wateringReady: 'Regador: toque em uma pedra para limpar 3×3.',
+    shovelUsed: 'Uma pedra foi removida com a pá.', wateringUsed: 'O regador limpou uma área de 3×3.', boosterCancel: 'Impulso cancelado. Escolha duas pedras vizinhas.',
+    specialCreated: (name) => `${name} criada! Ao ativar, ela pode causar novas reações.`,
+    specialActivated: 'Gema especial ativada — as reações em cadeia começaram!', noMovesBoosters: 'As jogadas acabaram — use os impulsos restantes!',
   },
 };
+
+function makeGem(color, special = null) { return { color, special }; }
+function colorAt(board, row, col) { return board[row]?.[col]?.color || null; }
+function keyOf(row, col) { return `${row},${col}`; }
+function parseKey(key) { return key.split(',').map(Number); }
 
 function makeRandomBoard() {
   const board = Array.from({ length: SIZE }, () => Array(SIZE).fill(null));
   for (let row = 0; row < SIZE; row += 1) {
     for (let col = 0; col < SIZE; col += 1) {
       const choices = COLORS.filter((color) => {
-        const makesHorizontal = col >= 2 && board[row][col - 1] === color && board[row][col - 2] === color;
-        const makesVertical = row >= 2 && board[row - 1][col] === color && board[row - 2][col] === color;
+        const makesHorizontal = col >= 2 && colorAt(board, row, col - 1) === color && colorAt(board, row, col - 2) === color;
+        const makesVertical = row >= 2 && colorAt(board, row - 1, col) === color && colorAt(board, row - 2, col) === color;
         return !makesHorizontal && !makesVertical;
       });
-      board[row][col] = choices[Math.floor(Math.random() * choices.length)];
+      board[row][col] = makeGem(choices[Math.floor(Math.random() * choices.length)]);
     }
   }
   return board;
 }
 
-function findMatches(board) {
-  const found = new Set();
+function findRuns(board) {
+  const runs = [];
   for (let row = 0; row < SIZE; row += 1) {
     let start = 0;
     while (start < SIZE) {
+      const color = colorAt(board, row, start);
       let end = start + 1;
-      while (end < SIZE && board[row][end] && board[row][end] === board[row][start]) end += 1;
-      if (board[row][start] && end - start >= 3) {
-        for (let col = start; col < end; col += 1) found.add(`${row},${col}`);
+      while (end < SIZE && color && colorAt(board, row, end) === color) end += 1;
+      if (color && end - start >= 3) {
+        runs.push({ color, orientation: 'row', cells: Array.from({ length: end - start }, (_, i) => [row, start + i]) });
       }
       start = end;
     }
@@ -72,15 +91,22 @@ function findMatches(board) {
   for (let col = 0; col < SIZE; col += 1) {
     let start = 0;
     while (start < SIZE) {
+      const color = colorAt(board, start, col);
       let end = start + 1;
-      while (end < SIZE && board[end][col] && board[end][col] === board[start][col]) end += 1;
-      if (board[start][col] && end - start >= 3) {
-        for (let row = start; row < end; row += 1) found.add(`${row},${col}`);
+      while (end < SIZE && color && colorAt(board, end, col) === color) end += 1;
+      if (color && end - start >= 3) {
+        runs.push({ color, orientation: 'column', cells: Array.from({ length: end - start }, (_, i) => [start + i, col]) });
       }
       start = end;
     }
   }
-  return [...found].map((key) => key.split(',').map(Number));
+  return runs;
+}
+
+function matchedKeys(runs) {
+  const keys = new Set();
+  for (const run of runs) for (const [row, col] of run.cells) keys.add(keyOf(row, col));
+  return keys;
 }
 
 function hasPossibleMove(board) {
@@ -90,8 +116,9 @@ function hasPossibleMove(board) {
         const nr = row + dr;
         const nc = col + dc;
         if (nr >= SIZE || nc >= SIZE) continue;
+        if (board[row][col]?.special || board[nr][nc]?.special) return true;
         [board[row][col], board[nr][nc]] = [board[nr][nc], board[row][col]];
-        const works = findMatches(board).length > 0;
+        const works = findRuns(board).length > 0;
         [board[row][col], board[nr][nc]] = [board[nr][nc], board[row][col]];
         if (works) return true;
       }
@@ -106,6 +133,43 @@ function freshPlayableBoard() {
   return board;
 }
 
+function specialCreatedBy(runs, board, first = null, second = null) {
+  const matched = matchedKeys(runs);
+  if (!matched.size) return null;
+  const preferred = [second, first].filter(Boolean).find(({ row, col }) => matched.has(keyOf(row, col)));
+  const rows = new Set();
+  const columns = new Set();
+  for (const run of runs) {
+    const target = run.orientation === 'row' ? rows : columns;
+    for (const [row, col] of run.cells) target.add(keyOf(row, col));
+  }
+  const intersection = [...rows].find((key) => columns.has(key));
+  let special;
+  let position = preferred;
+  if (runs.some((run) => run.cells.length >= 5)) special = 'rainbow';
+  else if (intersection) {
+    special = 'bomb';
+    const [intersectionRow, intersectionCol] = intersection.split(',').map(Number);
+    position = { row: intersectionRow, col: intersectionCol };
+  } else {
+    const longRun = runs.find((run) => run.cells.length >= 4);
+    if (!longRun) return null;
+    special = longRun.orientation;
+  }
+  if (!position) {
+    const run = runs.find((item) => item.cells.length >= 5) || runs.find((item) => item.cells.length >= 4) || runs[0];
+    const [row, col] = run.cells[Math.floor(run.cells.length / 2)];
+    position = { row, col };
+  }
+  if (board[position.row][position.col]?.special) {
+    const safeCell = [...matched].map(parseKey).find(([row, col]) => !board[row][col]?.special);
+    if (!safeCell) return null;
+    [position.row, position.col] = safeCell;
+  }
+  const gem = board[position.row][position.col];
+  return { ...position, gem: makeGem(gem.color, special) };
+}
+
 export function mountMatch3(container, { level = 1, language = 'de', onBack = () => {}, onReward = () => {} } = {}) {
   if (!container || typeof container.appendChild !== 'function') {
     throw new TypeError('mountMatch3 requires a DOM container.');
@@ -115,13 +179,15 @@ export function mountMatch3(container, { level = 1, language = 'de', onBack = ()
   const targetColor = TARGET_BY_LEVEL[Math.min(safeLevel - 1, TARGET_BY_LEVEL.length - 1)];
   const targetCount = 12 + 3 * safeLevel;
   let locale = Object.hasOwn(TEXT, language) ? language : 'de';
-  let board = ORIGINAL_BOARD.map((row) => row.slice());
+  let board = ORIGINAL_BOARD.map((row) => row.map((color) => makeGem(color)));
   let movesLeft = START_MOVES;
   let collected = 0;
   let selected = null;
   let busy = false;
   let finished = false;
   let destroyed = false;
+  let armedBooster = null;
+  const boosterCharges = { shovel: 2, watering: 1 };
   let returnTimer = null;
 
   const root = document.createElement('section');
@@ -144,6 +210,17 @@ export function mountMatch3(container, { level = 1, language = 'de', onBack = ()
       </div>
       <div class="match3-progress" role="progressbar" aria-valuemin="0" aria-valuemax="${targetCount}" aria-valuenow="0"><span class="match3-progress-fill"></span></div>
       <div class="match3-board" role="grid" aria-label=""></div>
+      <section class="match3-power-guide" aria-label="">
+        <strong class="match3-guide-title"></strong>
+        <div class="match3-power-list"></div>
+      </section>
+      <section class="match3-booster-panel" aria-label="">
+        <strong class="match3-booster-title"></strong>
+        <div class="match3-booster-list">
+          <button class="match3-booster" data-booster="shovel" type="button"><span class="match3-booster-icon" aria-hidden="true">⌁</span><span class="match3-booster-copy"><b></b><small></small></span></button>
+          <button class="match3-booster" data-booster="watering" type="button"><span class="match3-booster-icon" aria-hidden="true">✿</span><span class="match3-booster-copy"><b></b><small></small></span></button>
+        </div>
+      </section>
       <p class="match3-hint" aria-live="polite" aria-atomic="true"></p>
     </div>`;
   container.appendChild(root);
@@ -156,7 +233,10 @@ export function mountMatch3(container, { level = 1, language = 'de', onBack = ()
   const goalElement = $('.match3-goal-value');
   const progressElement = $('.match3-progress');
   const progressFill = $('.match3-progress-fill');
+  const boosterButtons = { shovel: $('[data-booster="shovel"]'), watering: $('[data-booster="watering"]') };
   let cells = [];
+  let pointerStart = null;
+  let suppressNextClick = false;
 
   for (let row = 0; row < SIZE; row += 1) {
     const rowElement = document.createElement('div');
@@ -171,8 +251,11 @@ export function mountMatch3(container, { level = 1, language = 'de', onBack = ()
       button.dataset.row = String(row);
       button.dataset.col = String(col);
       button.setAttribute('aria-pressed', 'false');
-      button.innerHTML = '<span class="match3-gem" aria-hidden="true"></span>';
-      button.addEventListener('click', () => handleTile(row, col));
+      button.innerHTML = '<span class="match3-gem" aria-hidden="true"></span><span class="match3-power-icon" aria-hidden="true"></span>';
+      button.addEventListener('click', () => {
+        if (suppressNextClick) { suppressNextClick = false; return; }
+        handleTile(row, col);
+      });
       button.addEventListener('keydown', (event) => {
         const offsets = { ArrowUp: [-1, 0], ArrowDown: [1, 0], ArrowLeft: [0, -1], ArrowRight: [0, 1] };
         const offset = offsets[event.key];
@@ -190,13 +273,53 @@ export function mountMatch3(container, { level = 1, language = 'de', onBack = ()
     boardElement.appendChild(rowElement);
   }
 
-  function translate(key) {
-    return TEXT[locale][key];
+  root.addEventListener('pointerdown', (event) => {
+    const tile = event.target.closest?.('.match3-tile');
+    if (!tile) return;
+    pointerStart = { row: Number(tile.dataset.row), col: Number(tile.dataset.col), x: event.clientX, y: event.clientY };
+  });
+  root.addEventListener('pointerup', (event) => {
+    if (!pointerStart) return;
+    const start = pointerStart;
+    pointerStart = null;
+    const dx = event.clientX - start.x;
+    const dy = event.clientY - start.y;
+    if (Math.max(Math.abs(dx), Math.abs(dy)) < 18) return;
+    const [dr, dc] = Math.abs(dx) >= Math.abs(dy) ? [0, Math.sign(dx)] : [Math.sign(dy), 0];
+    const nextRow = start.row + dr;
+    const nextCol = start.col + dc;
+    if (nextRow < 0 || nextRow >= SIZE || nextCol < 0 || nextCol >= SIZE) return;
+    suppressNextClick = true;
+    if (armedBooster) handleTile(start.row, start.col);
+    else {
+      selected = { row: start.row, col: start.col };
+      handleTile(nextRow, nextCol);
+    }
+    window.setTimeout(() => { suppressNextClick = false; }, 80);
+  });
+  root.addEventListener('pointercancel', () => { pointerStart = null; });
+
+  function translate(key) { return TEXT[locale][key]; }
+
+  function updateBoosterUI() {
+    const text = TEXT[locale];
+    const names = { shovel: text.shovel, watering: text.watering };
+    for (const kind of ['shovel', 'watering']) {
+      const button = boosterButtons[kind];
+      const count = boosterCharges[kind];
+      button.querySelector('b').textContent = names[kind];
+      button.querySelector('small').textContent = text.uses(count);
+      button.setAttribute('aria-label', `${names[kind]}: ${text.uses(count)}`);
+      button.title = kind === 'shovel' ? text.shovelReady : text.wateringReady;
+      button.disabled = busy || finished || count <= 0;
+      button.classList.toggle('is-armed', armedBooster === kind);
+    }
+    root.classList.toggle('match3-booster-armed', Boolean(armedBooster));
   }
 
   function updateTexts() {
     const text = TEXT[locale];
-    $('.match3-kicker').textContent = `LEVEL ${safeLevel}`;
+    $('.match3-kicker').textContent = `${text.levelLabel} ${safeLevel}`;
     $('.match3-title').textContent = text.title;
     $('.match3-subtitle').textContent = text.subtitle;
     $('.match3-back').textContent = text.back;
@@ -205,11 +328,24 @@ export function mountMatch3(container, { level = 1, language = 'de', onBack = ()
     $('.match3-collected-label').textContent = text.collected;
     $('.match3-stats').setAttribute('aria-label', `${text.moves}, ${text.goal}, ${text.collected}`);
     boardElement.setAttribute('aria-label', text.title);
+    $('.match3-power-guide').setAttribute('aria-label', text.powersTitle);
+    $('.match3-guide-title').textContent = text.powersTitle;
+    $('.match3-booster-panel').setAttribute('aria-label', text.boostersTitle);
+    $('.match3-booster-title').textContent = text.boostersTitle;
+    const icons = { row: '↔', column: '↕', bomb: '✿', rainbow: '✧' };
+    $('.match3-power-list').replaceChildren();
+    for (const kind of ['row', 'column', 'bomb', 'rainbow']) {
+      const item = document.createElement('span');
+      item.className = `match3-power-chip match3-power-chip-${kind}`;
+      item.innerHTML = `<b aria-hidden="true">${icons[kind]}</b><span><strong>${text.powerNames[kind]}</strong><small>${text.powerHints[kind]}</small></span>`;
+      $('.match3-power-list').appendChild(item);
+    }
     $('.match3-target-gem').className = `match3-target-gem match3-gem-${targetColor.toLowerCase()}`;
     goalElement.textContent = `${text.colors[targetColor]} · ${targetCount}`;
-    if (!finished && !selected && !busy) statusElement.textContent = text.hint;
+    if (!finished && !selected && !busy && !armedBooster) statusElement.textContent = text.hint;
     refreshBoard();
     updateCounters();
+    updateBoosterUI();
   }
 
   function updateCounters() {
@@ -224,13 +360,19 @@ export function mountMatch3(container, { level = 1, language = 'de', onBack = ()
     for (let row = 0; row < SIZE; row += 1) {
       for (let col = 0; col < SIZE; col += 1) {
         const button = cells[row][col];
-        const color = board[row][col];
-        button.className = `match3-tile match3-gem-${color.toLowerCase()}`;
-        button.disabled = busy || finished;
+        const gem = board[row][col];
+        const color = gem?.color || 'Green';
+        const special = gem?.special || null;
+        button.className = `match3-tile match3-gem-${color.toLowerCase()}${special ? ` match3-special match3-special-${special}` : ''}`;
+        button.disabled = busy || finished || !gem;
         button.setAttribute('aria-pressed', String(Boolean(selected && selected.row === row && selected.col === col)));
-        button.setAttribute('aria-label', `${TEXT[locale].colors[color]}, ${locale === 'de' ? 'Reihe' : 'linha'} ${row + 1}, ${locale === 'de' ? 'Spalte' : 'coluna'} ${col + 1}`);
+        const colorName = TEXT[locale].colors[color];
+        const specialName = special ? `, ${TEXT[locale].powerNames[special]}` : '';
+        button.setAttribute('aria-label', `${colorName}${specialName}, ${locale === 'de' ? 'Reihe' : 'linha'} ${row + 1}, ${locale === 'de' ? 'Spalte' : 'coluna'} ${col + 1}`);
+        button.querySelector('.match3-power-icon').textContent = special ? SPECIAL_SYMBOLS[special] : '';
       }
     }
+    updateBoosterUI();
   }
 
   function swap(first, second) {
@@ -238,10 +380,20 @@ export function mountMatch3(container, { level = 1, language = 'de', onBack = ()
   }
 
   function handleTile(row, col) {
-    if (busy || finished) return;
+    if (busy || finished || !board[row][col]) return;
+    if (armedBooster) {
+      useBooster(armedBooster, row, col);
+      return;
+    }
+    if (movesLeft <= 0) {
+      selected = null;
+      statusElement.textContent = TEXT[locale].noMovesBoosters;
+      refreshBoard();
+      return;
+    }
     if (!selected) {
       selected = { row, col };
-      statusElement.textContent = TEXT[locale].selected(TEXT[locale].colors[board[row][col]], row + 1, col + 1);
+      statusElement.textContent = TEXT[locale].selected(TEXT[locale].colors[board[row][col].color], row + 1, col + 1);
       refreshBoard();
       return;
     }
@@ -255,7 +407,7 @@ export function mountMatch3(container, { level = 1, language = 'de', onBack = ()
     const second = { row, col };
     if (Math.abs(first.row - row) + Math.abs(first.col - col) !== 1) {
       selected = second;
-      statusElement.textContent = TEXT[locale].selected(TEXT[locale].colors[board[row][col]], row + 1, col + 1);
+      statusElement.textContent = TEXT[locale].selected(TEXT[locale].colors[board[row][col].color], row + 1, col + 1);
       refreshBoard();
       return;
     }
@@ -265,8 +417,11 @@ export function mountMatch3(container, { level = 1, language = 'de', onBack = ()
     refreshBoard();
     window.setTimeout(() => {
       if (destroyed) return;
-      const matches = findMatches(board);
-      if (!matches.length) {
+      const runs = findRuns(board);
+      const firstGem = board[first.row][first.col];
+      const secondGem = board[second.row][second.col];
+      const activatedSpecial = firstGem.special || secondGem.special;
+      if (!runs.length && !activatedSpecial) {
         swap(first, second);
         busy = false;
         statusElement.textContent = TEXT[locale].invalid;
@@ -275,19 +430,103 @@ export function mountMatch3(container, { level = 1, language = 'de', onBack = ()
       }
       movesLeft -= 1;
       updateCounters();
-      resolveCascade();
+      if (activatedSpecial) {
+        const triggerColor = firstGem.special === 'rainbow' ? secondGem.color : secondGem.special === 'rainbow' ? firstGem.color : null;
+        statusElement.textContent = TEXT[locale].specialActivated;
+        resolveCascade({ seedCells: [keyOf(first.row, first.col), keyOf(second.row, second.col)], triggerColor });
+        return;
+      }
+      resolveCascade({ preferredCells: [second, first] });
     }, 150);
   }
 
-  function resolveCascade() {
+  function useBooster(kind, row, col) {
+    if (boosterCharges[kind] <= 0) return;
+    boosterCharges[kind] -= 1;
+    armedBooster = null;
+    selected = null;
+    busy = true;
+    const text = TEXT[locale];
+    statusElement.textContent = kind === 'shovel' ? text.shovelUsed : text.wateringUsed;
+    updateBoosterUI();
+    refreshBoard();
+    const seedCells = [];
+    if (kind === 'shovel') seedCells.push(keyOf(row, col));
+    else {
+      for (let r = Math.max(0, row - 1); r <= Math.min(SIZE - 1, row + 1); r += 1) {
+        for (let c = Math.max(0, col - 1); c <= Math.min(SIZE - 1, col + 1); c += 1) seedCells.push(keyOf(r, c));
+      }
+    }
+    window.setTimeout(() => { if (!destroyed) resolveCascade({ seedCells }); }, 140);
+  }
+
+  function selectBooster(kind) {
+    if (busy || finished || boosterCharges[kind] <= 0) return;
+    armedBooster = armedBooster === kind ? null : kind;
+    selected = null;
+    statusElement.textContent = armedBooster
+      ? (kind === 'shovel' ? TEXT[locale].shovelReady : TEXT[locale].wateringReady)
+      : TEXT[locale].boosterCancel;
+    refreshBoard();
+    updateBoosterUI();
+  }
+
+  function expandSpecials(initialKeys, triggerColor = null) {
+    const clear = new Set(initialKeys);
+    const queue = [...initialKeys];
+    const activated = new Set();
+    const add = (row, col) => {
+      if (row < 0 || row >= SIZE || col < 0 || col >= SIZE) return;
+      const key = keyOf(row, col);
+      if (!clear.has(key)) {
+        clear.add(key);
+        queue.push(key);
+      }
+    };
+    while (queue.length) {
+      const key = queue.shift();
+      if (activated.has(key)) continue;
+      activated.add(key);
+      const [row, col] = parseKey(key);
+      const gem = board[row]?.[col];
+      if (!gem?.special) continue;
+      if (gem.special === 'row') {
+        for (let c = 0; c < SIZE; c += 1) add(row, c);
+      } else if (gem.special === 'column') {
+        for (let r = 0; r < SIZE; r += 1) add(r, col);
+      } else if (gem.special === 'bomb') {
+        for (let r = row - 1; r <= row + 1; r += 1) for (let c = col - 1; c <= col + 1; c += 1) add(r, c);
+      } else if (gem.special === 'rainbow') {
+        const target = triggerColor || gem.color;
+        for (let r = 0; r < SIZE; r += 1) for (let c = 0; c < SIZE; c += 1) if (colorAt(board, r, c) === target) add(r, c);
+      }
+    }
+    return clear;
+  }
+
+  function resolveCascade({ seedCells = [], protectedKey = null, triggerColor = null, preferredCells = [] } = {}) {
     if (destroyed) return;
-    const matches = findMatches(board);
-    if (!matches.length) {
+    const runs = findRuns(board);
+    let protectedMatchKey = protectedKey;
+    if (!protectedMatchKey) {
+      const created = specialCreatedBy(runs, board, preferredCells[0] || null, preferredCells[1] || null);
+      if (created) {
+        board[created.row][created.col] = created.gem;
+        protectedMatchKey = keyOf(created.row, created.col);
+        statusElement.textContent = TEXT[locale].specialCreated(TEXT[locale].powerNames[created.gem.special]);
+      }
+    }
+    const clear = new Set([...matchedKeys(runs), ...seedCells]);
+    if (protectedMatchKey) clear.delete(protectedMatchKey);
+    if (!clear.size) {
       busy = false;
       refreshBoard();
       updateCounters();
       if (collected >= targetCount) finish(true);
-      else if (movesLeft <= 0) finish(false);
+      else if (movesLeft <= 0) {
+        if (boosterCharges.shovel + boosterCharges.watering > 0) statusElement.textContent = TEXT[locale].noMovesBoosters;
+        else finish(false);
+      }
       else if (!hasPossibleMove(board)) {
         board = freshPlayableBoard();
         refreshBoard();
@@ -296,12 +535,19 @@ export function mountMatch3(container, { level = 1, language = 'de', onBack = ()
       return;
     }
 
-    for (const [row, col] of matches) if (board[row][col] === targetColor) collected += 1;
-    for (const [row, col] of matches) cells[row][col].classList.add('match3-clearing');
+    const expanded = expandSpecials([...clear], triggerColor);
+    for (const key of expanded) {
+      const [row, col] = parseKey(key);
+      if (colorAt(board, row, col) === targetColor) collected += 1;
+      cells[row][col].classList.add('match3-clearing');
+    }
     updateCounters();
     window.setTimeout(() => {
       if (destroyed) return;
-      for (const [row, col] of matches) board[row][col] = null;
+      for (const key of expanded) {
+        const [row, col] = parseKey(key);
+        board[row][col] = null;
+      }
       for (let col = 0; col < SIZE; col += 1) {
         let writeRow = SIZE - 1;
         for (let row = SIZE - 1; row >= 0; row -= 1) {
@@ -311,12 +557,12 @@ export function mountMatch3(container, { level = 1, language = 'de', onBack = ()
           }
         }
         while (writeRow >= 0) {
-          board[writeRow][col] = COLORS[Math.floor(Math.random() * COLORS.length)];
+          board[writeRow][col] = makeGem(COLORS[Math.floor(Math.random() * COLORS.length)]);
           writeRow -= 1;
         }
       }
       refreshBoard();
-      window.setTimeout(resolveCascade, 180);
+      window.setTimeout(() => resolveCascade(), 180);
     }, 220);
   }
 
@@ -325,6 +571,7 @@ export function mountMatch3(container, { level = 1, language = 'de', onBack = ()
     finished = true;
     busy = false;
     selected = null;
+    armedBooster = null;
     refreshBoard();
     statusElement.textContent = won ? TEXT[locale].win : TEXT[locale].lose;
     root.classList.add(won ? 'match3-won' : 'match3-lost');
@@ -340,6 +587,8 @@ export function mountMatch3(container, { level = 1, language = 'de', onBack = ()
     if (returnTimer !== null) window.clearTimeout(returnTimer);
     onBack();
   });
+  boosterButtons.shovel.addEventListener('click', () => selectBooster('shovel'));
+  boosterButtons.watering.addEventListener('click', () => selectBooster('watering'));
 
   function setLanguage(nextLanguage) {
     locale = Object.hasOwn(TEXT, nextLanguage) ? nextLanguage : 'de';

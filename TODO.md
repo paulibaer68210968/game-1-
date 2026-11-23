@@ -24,12 +24,20 @@
 - Drei oder mehr horizontale/vertikale Steine bilden Matches; Kaskaden werden aufgelöst, Steine fallen nach und neue Farben erscheinen.
 - Gültige Züge kosten einen Zug; Levelziel/Farbe, Erfolg/Niederlage, Sternbelohnung und Rückkehr in den Garten bleiben erhalten.
 
-## 5. Bewegungsabhängige Wichtel-Wippe
+## 5. Match-3-Spezialsteine und Booster
+- Der Nutzer bat: „Lass uns das Gameplay um weitere Match-3-Spezialsteine und Booster erweitern.“
+- Vier gleiche Steine in einer Linie erzeugen eine richtungsabhängige Rakete, die eine ganze Zeile oder Spalte räumt; fünf gleiche Steine erzeugen einen Regenbogenstein, der bei Aktivierung Steine einer Farbe entfernt; ein L-/T-förmiger Treffer erzeugt eine Blumenbombe, die ein 3×3-Feld räumt. Diese Muster erzeugen Spezialsteine auch in Nachrück-Kaskaden.
+- Aktivierte Spezialsteine dürfen weitere Spezialsteine auslösen und dadurch nachvollziehbare Kaskaden bilden.
+- Pro Match-Instanz stehen zwei Gartenschaufeln zur Verfügung, die nach Auswahl ein Feld entfernen, sowie eine Gießkanne, die nach Auswahl ein 3×3-Feld räumt. Booster verbrauchen keinen Zug, bleiben auch bei null Zügen einsetzbar, ihre Anzahl wird angezeigt und sie werden beim Start einer neuen Match-Instanz aufgefüllt.
+- Abgeräumte Steine der Level-Zielfarbe zählen auch dann zum Sammelziel, wenn sie durch einen Spezialstein oder Booster entfernt wurden.
+- Bedienung per Tippen/Klicken und Wischen, Leveltitel, Spezialstein-Erklärungen, Boosterstatus und Spielmeldungen sind auf Deutsch und brasilianischem Portugiesisch verfügbar; das bestehende 8×8-Feld, fünf Farben, Zugzähler, Kaskaden, Levelziel und Belohnungsfluss bleiben erhalten.
+
+## 6. Bewegungsabhängige Wichtel-Wippe
 - Der Nutzer bat: „Füge dem Wichtel eine einfache Laufanimation oder Wackel-Animation hinzu, wenn er sich bewegt.“
 - Eine dezente Wipp-/Seitbewegung läuft nur bei geerdeter Bewegung, beruhigt sich im Stillstand und ist keine Laufanimation während eines Sprungs.
 - Die Bewegung verändert nur das sichtbare Modell, nie Physik-/Kamerawurzel oder Kollisionsdaten.
 
-## 6. Gemütliche isometrische Gartengestaltung nach Referenz
+## 7. Gemütliche isometrische Gartengestaltung nach Referenz
 - Der Nutzer bat: „kann's du das Spiel in dieser Art erstellen?“; die neu angehängte Referenz zeigt eine gemütliche, detailreiche isometrische Gartenansicht mit gepflasterten Wegen, üppigen Beeten, dekorativen Objekten und sichtbarer Design-/Auswahloberfläche.
 - Gestalte die bestehende Three.js-Gartenwelt in dieser visuellen Richtung: feste orthografische Isometrie, warme Storybook-Farbwelt, lesbare Wege/Beete und auffindbare Dekorationen; nutze das Bild als Stilhinweis, ohne fremde Figuren, Anordnung oder konkrete UI zu kopieren.
 - Zeige eine klar erkennbare Marken-/Statusoberfläche sowie eine Dekorationsauswahl; Shop, Kosten, Platzieren und Touch-Steuerung bleiben nutzbar.

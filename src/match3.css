@@ -153,6 +153,7 @@
   background: linear-gradient(145deg, #d5bf91, #b49b6b);
   box-shadow: inset 0 2px 5px rgba(61, 43, 20, .22), 0 5px 9px rgba(60, 55, 33, .15);
   user-select: none;
+  touch-action: pan-y;
 }
 
 .match3-row { display: grid; grid-template-columns: repeat(8, minmax(0, 1fr)); gap: 5px; }
@@ -204,6 +205,113 @@
 .match3-gem-purple .match3-gem,
 .match3-gem-purple.match3-target-gem { background: linear-gradient(135deg, #e7bdff 0%, #a263d5 48%, #6b43a0 100%); }
 
+.match3-special {
+  border-color: #98753c;
+  box-shadow: inset 0 0 0 2px rgba(255, 246, 190, .95), 0 0 0 1px #fff7da, 0 2px 4px rgba(69, 50, 23, .35);
+}
+.match3-special-row, .match3-special-column { background: linear-gradient(145deg, #ffe9a6, #d7ad55); }
+.match3-special-bomb { background: radial-gradient(circle, #fff4bf, #e5b759 72%, #c58c3a); }
+.match3-special-rainbow { background: conic-gradient(#f06a58, #f3c451, #75bd67, #58a7dd, #a270cd, #f06a58); }
+.match3-special-rainbow .match3-gem { background: conic-gradient(#f06a58, #f3c451, #75bd67, #58a7dd, #a270cd, #f06a58); }
+.match3-power-icon {
+  position: absolute;
+  top: 1px;
+  right: 2px;
+  z-index: 1;
+  color: #fffdf1;
+  font: 900 clamp(9px, 2.1vw, 13px)/1 system-ui, sans-serif;
+  -webkit-text-stroke: .45px #65502f;
+  filter: drop-shadow(0 1px 1px rgba(41, 33, 16, .6));
+}
+.match3-special-row .match3-power-icon,
+.match3-special-column .match3-power-icon { top: 50%; right: 50%; transform: translate(50%, -50%); font-size: clamp(17px, 4vw, 23px); }
+.match3-special-bomb .match3-power-icon,
+.match3-special-rainbow .match3-power-icon { top: 50%; right: 50%; transform: translate(50%, -50%); font-size: clamp(18px, 4.2vw, 25px); }
+
+.match3-power-guide,
+.match3-booster-panel { margin-top: 11px; }
+.match3-guide-title,
+.match3-booster-title {
+  display: block;
+  margin: 0 2px 6px;
+  color: #556647;
+  font: 800 .7rem/1.2 system-ui, sans-serif;
+  letter-spacing: .07em;
+  text-transform: uppercase;
+}
+.match3-power-list {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 5px 7px;
+}
+.match3-power-chip {
+  display: flex;
+  min-width: 0;
+  align-items: center;
+  gap: 6px;
+  padding: 5px 7px;
+  border: 1px solid #e4d5b3;
+  border-radius: 9px;
+  background: rgba(255, 255, 255, .55);
+  font-family: system-ui, sans-serif;
+}
+.match3-power-chip > b {
+  display: grid;
+  width: 23px;
+  height: 23px;
+  flex: 0 0 auto;
+  place-items: center;
+  border: 1px solid #a8884e;
+  border-radius: 7px;
+  color: #fff;
+  background: linear-gradient(145deg, #e4c375, #ab813e);
+  font-size: .95rem;
+  text-shadow: 0 1px 2px #62461e;
+}
+.match3-power-chip-rainbow > b { background: conic-gradient(#e86d5e, #eab952, #6fa95e, #5696ca, #9870bd, #e86d5e); }
+.match3-power-chip span { display: flex; min-width: 0; flex-direction: column; gap: 1px; }
+.match3-power-chip strong { overflow: hidden; color: #3f5539; font-size: .68rem; line-height: 1.15; text-overflow: ellipsis; white-space: nowrap; }
+.match3-power-chip small { overflow: hidden; color: #737760; font-size: .59rem; line-height: 1.15; text-overflow: ellipsis; white-space: nowrap; }
+
+.match3-booster-list { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 8px; }
+.match3-booster {
+  display: flex;
+  min-width: 0;
+  min-height: 48px;
+  align-items: center;
+  gap: 8px;
+  padding: 6px 9px;
+  border: 1px solid #9a8358;
+  border-radius: 12px;
+  color: #3e5738;
+  background: linear-gradient(145deg, #fffdf4, #efe2c5);
+  box-shadow: 0 2px 0 #d3c09a;
+  text-align: left;
+  cursor: pointer;
+  touch-action: manipulation;
+}
+.match3-booster:hover:not(:disabled) { background: #fff8dc; }
+.match3-booster:active:not(:disabled) { transform: translateY(1px); box-shadow: 0 1px 0 #d3c09a; }
+.match3-booster:focus-visible { outline: 3px solid #a66b16; outline-offset: 2px; }
+.match3-booster:disabled { opacity: .57; cursor: default; }
+.match3-booster.is-armed { border: 2px solid #4f7943; background: #e5f0d9; box-shadow: 0 0 0 2px rgba(79, 121, 67, .17), 0 2px 0 #a9c49a; }
+.match3-booster-icon {
+  display: grid;
+  width: 30px;
+  height: 30px;
+  flex: 0 0 auto;
+  place-items: center;
+  border-radius: 9px;
+  color: #fff9e9;
+  background: linear-gradient(145deg, #8eaa6e, #557645);
+  font: 900 1.15rem/1 system-ui, sans-serif;
+  text-shadow: 0 1px 2px rgba(36, 56, 29, .55);
+}
+.match3-booster-copy { display: flex; min-width: 0; flex-direction: column; gap: 3px; }
+.match3-booster-copy b { overflow: hidden; font: 800 .73rem/1.1 system-ui, sans-serif; text-overflow: ellipsis; white-space: nowrap; }
+.match3-booster-copy small { color: #68745e; font: 700 .63rem/1 system-ui, sans-serif; }
+.match3-booster-armed .match3-tile:not(:disabled) { cursor: crosshair; }
+
 .match3-target-gem { clip-path: polygon(50% 0%, 92% 23%, 83% 76%, 50% 100%, 17% 76%, 8% 23%); }
 .match3-hint {
   min-height: 2.7em;
@@ -236,7 +344,32 @@
   .match3-stat-label { font-size: .62rem; }
   .match3-stat strong { font-size: .96rem; }
   .match3-goal-line strong { font-size: .8rem; }
+  .match3-power-guide, .match3-booster-panel { margin-top: 8px; }
+  .match3-power-chip { gap: 4px; padding: 4px 5px; }
+  .match3-power-chip > b { width: 20px; height: 20px; }
+  .match3-power-chip strong { font-size: .62rem; }
+  .match3-power-chip small { font-size: .55rem; }
+  .match3-booster-list { gap: 6px; }
+  .match3-booster { min-height: 43px; gap: 6px; padding: 5px 6px; }
+  .match3-booster-icon { width: 26px; height: 26px; }
+  .match3-booster-copy b { font-size: .66rem; }
+  .match3-booster-copy small { font-size: .58rem; }
   .match3-hint { margin-top: 8px; font-size: .8rem; }
+}
+
+@media (max-width: 350px) {
+  .match3-overlay { padding-right: 3px; padding-left: 3px; }
+  .match3-card { padding: 9px 7px 7px; border-width: 2px; }
+  .match3-board { gap: 2px; padding: 4px; border-width: 2px; }
+  .match3-row { gap: 2px; }
+  .match3-tile { border-radius: 5px; }
+  .match3-header { gap: 6px; }
+  .match3-back { min-height: 38px; padding: 7px 10px; font-size: .8rem; }
+  .match3-power-list { gap: 4px; }
+  .match3-power-chip { gap: 3px; padding: 3px; }
+  .match3-power-chip > b { width: 18px; height: 18px; }
+  .match3-power-chip strong { font-size: .57rem; }
+  .match3-power-chip small { font-size: .51rem; }
 }
 
 @media (prefers-reduced-motion: reduce) {
