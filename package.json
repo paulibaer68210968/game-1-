@@ -1,0 +1,15 @@
+{
+  "name": "gertrudes-greinwald-garden",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "description": "Eigenständiges Three.js-Gartenspiel ohne GDevelop-Laufzeit",
+  "packageManager": "pnpm@11.25.0",
+  "scripts": {
+    "build": "esbuild src/main.js --bundle --format=esm --target=es2020 --outfile=game.bundle.js --minify --legal-comments=external --loader:.ttf=file --loader:.png=file --asset-names=assets/[name]-[hash]"
+  },
+  "devDependencies": {
+    "esbuild": "0.28.2",
+    "three": "0.187.0"
+  }
+}

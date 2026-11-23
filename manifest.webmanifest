@@ -1,12 +1,13 @@
 {
   "name": "Gertrudes Greinwald privater Garten",
-  "short_name": "Gertrudes Greinwald privater Garten",
-  "id": "com.example.gamename",
-  "description": "Ein 3D-Gartenabenteuer mit Wegen, Hügeln, Münzen und einem Teich.",
+  "short_name": "Greinwald Garten",
+  "id": "./",
+  "description": "Ein 3D-Gartenabenteuer mit Wichtel, Wegen, Hügeln, Münzen und einem Teich.",
   "orientation": "landscape",
-  "start_url": "./index.html",
+  "start_url": "./",
   "display": "standalone",
-  "background_color": "#163222",
+  "background_color": "#173a29",
+  "theme_color": "#173a29",
   "categories": ["games", "entertainment"],
   "icons": []
 }
