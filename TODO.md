@@ -1,5 +1,11 @@
 # TODO – 2D-Android-Neuaufbau
 
+## 0. Vollbild-Garten und Villa per Finger erkunden und frei dekorieren
+- In der Villa und im Garten kann die Spielerin oder der Spieler die Vollbild-Szene mit dem Finger frei erkunden und die Ansicht durch Wischen verschieben.
+- Gegenstände aus einer zusätzlichen Dekorationsauswahl lassen sich direkt in der Szene platzieren, mit dem Finger frei verschieben und in ihrer Position speichern.
+- Die Auswahl bietet mehrere zusätzliche, passende Gegenstände für Garten und Villa; die Szenenobjekte bleiben mit den Renovierungen und gespeicherten Varianten erhalten.
+- Tapeten können direkt an der Wand angebracht werden; die vorhandenen Tapetenvarianten und Sterne-/Renovierungsfortschritte bleiben erhalten.
+
 ## 1. 2D-Anwesen mit fingerbedientem Garten- und Villenausbau
 - Der Nutzer wählte die Richtung „Match‑3-Gartenaufbau neu gestalten“ und ergänzte: „2 D reicht ist auch besser sichtbar...als Erfolge eben Villa und Gärten Ausbau...Möbel, Tapeten, Pflanzen und Werkzeuge“.
 - Erlaubt ist, den bisherigen Three.js-Spielablauf umfassend zu ersetzen. Das aktive Spiel zeigt ein eigenes, gut sichtbares 2D-Anwesen mit Garten und Villa; keine freie 3D-Bewegung, Tastatur, Maus oder virtueller Joystick werden vorausgesetzt.

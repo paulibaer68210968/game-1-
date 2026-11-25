@@ -4,7 +4,9 @@ import { mountMatch3 } from './match3.js';
 import { renderGardenScene } from './garden.js';
 import { copyFor, localized } from './localization.js';
 import { ART } from './art.js';
+import { decorationsForArea, getDecoration } from './decorations.js';
 import { applyRenovation, initialVariant, isRenovated, tasksForArea } from './progression.js';
+import { clampScenePosition, normalizeScenePan, panScene, pointOnScene } from './scene-placement.js';
 
 const SAVE_KEY = 'gertrudes-greinwald-garden-save-v2';
 const LEGACY_SAVE_KEY = 'gertrudes-greinwald-garden-save-v1';
@@ -15,6 +17,8 @@ const DEFAULT_SAVE = Object.freeze({
   language: 'de',
   activeScene: 'garden',
   renovations: {},
+  decorations: { garden: [], villa: [] },
+  scenePan: { garden: { x: 0, y: 0 }, villa: { x: 0, y: 0 } },
   legacyDecor: [],
 });
 
@@ -26,6 +30,7 @@ let fullscreenTasksCollapsed = false;
 let toastTimer = null;
 const selectedVariants = new Map();
 const expandedTasks = new Set();
+let activePlacement = null;
 
 function validLanguage(language) {
   return language === 'pt-BR' ? 'pt-BR' : 'de';
@@ -43,8 +48,25 @@ function normalizedSave(value = {}) {
     language: validLanguage(value.language),
     activeScene,
     renovations: { ...renovations },
+    decorations: {
+      garden: normalizeDecorations(value.decorations?.garden, 'garden'),
+      villa: normalizeDecorations(value.decorations?.villa, 'villa'),
+    },
+    scenePan: {
+      garden: normalizeScenePan(value.scenePan?.garden),
+      villa: normalizeScenePan(value.scenePan?.villa),
+    },
     legacyDecor: Array.isArray(value.legacyDecor) ? value.legacyDecor : [],
   };
+}
+
+function normalizeDecorations(items, area) {
+  if (!Array.isArray(items)) return [];
+  return items.slice(0, 60).flatMap((item) => {
+    if (!item || typeof item !== 'object' || typeof item.instance !== 'string') return [];
+    if (!/^[a-z0-9-]{1,96}$/i.test(item.instance) || !getDecoration(item.key, area)) return [];
+    return [{ instance: item.instance, key: item.key, x: clampScenePosition(item.x), y: clampScenePosition(item.y) }];
+  });
 }
 
 function migrateLegacySave(oldSave) {
@@ -195,6 +217,25 @@ function renderTasks(copy) {
   for (const task of tasks) taskList.appendChild(renderTaskCard(task, copy));
 }
 
+function renderDecorationTray(copy, area) {
+  const items = decorationsForArea(area).map((item) => `
+    <button class="decoration-choice" type="button" data-place-decoration="${item.id}" aria-label="${copy[item.label]}">
+      <img src="${item.asset}" alt="" draggable="false"><span>${copy[item.label]}</span>
+    </button>`).join('');
+  const wallpaper = area === 'villa' ? `
+    <div class="wallpaper-tools" role="group" aria-label="${copy.wallpaperTool}">
+      <strong>${copy.wallpaperTool}</strong>
+      <button class="wallpaper-choice${activePlacement?.type === 'wallpaper' && activePlacement.variant === 'sage' ? ' is-selected' : ''}" type="button" data-place-wallpaper="sage" aria-pressed="${activePlacement?.type === 'wallpaper' && activePlacement.variant === 'sage'}">${copy.wallpaperSage}</button>
+      <button class="wallpaper-choice${activePlacement?.type === 'wallpaper' && activePlacement.variant === 'rose' ? ' is-selected' : ''}" type="button" data-place-wallpaper="rose" aria-pressed="${activePlacement?.type === 'wallpaper' && activePlacement.variant === 'rose'}">${copy.wallpaperRose}</button>
+    </div>` : '';
+  return `<section class="placement-tools" aria-labelledby="placementHeading">
+    <h3 id="placementHeading">${copy.decorHeading}</h3>
+    <p class="placement-help" data-placement-help>${activePlacement?.type === 'wallpaper' ? copy.wallpaperHint : copy.decorHelp}</p>
+    ${wallpaper}
+    <div class="decoration-tray">${items}</div>
+  </section>`;
+}
+
 function renderFullscreen(copy, currentIsGarden) {
   appRoot.innerHTML = `
     <section class="renovation-fullscreen" role="dialog" aria-modal="true" aria-labelledby="fullscreenTitle">
@@ -216,12 +257,94 @@ function renderFullscreen(copy, currentIsGarden) {
           <div class="renovation-heading"><div><p class="section-kicker">${currentIsGarden ? copy.gardenTasks : copy.villaTasks}</p><h2 id="taskHeading">${copy.taskHeading}</h2></div><span class="star-reminder">★ ${save.stars}</span></div>
           <p class="task-hint">${copy.taskHint}</p>
           <div class="task-list" id="taskList"></div>
+          ${renderDecorationTray(copy, save.activeScene)}
         </div>
       </section>
       <div class="game-toast" id="gameToast" role="status" aria-live="polite" aria-atomic="true"></div>
     </section>`;
   renderGardenScene(appRoot.querySelector('#fullscreenSceneCanvas'), save, save.language);
+  const scene = appRoot.querySelector('.fullscreen-scene-canvas .diorama');
+  if (scene) {
+    const pan = normalizeScenePan(save.scenePan[save.activeScene]);
+    scene.style.setProperty('--scene-pan-x', `${pan.x * window.innerWidth}px`);
+    scene.style.setProperty('--scene-pan-y', `${pan.y * window.innerHeight}px`);
+    attachSceneGestures(appRoot.querySelector('#fullscreenSceneCanvas'), scene);
+  }
   renderTasks(copy);
+}
+
+function saveSceneItemPosition(element, area, point) {
+  const instance = element.dataset.instance;
+  const key = element.dataset.decorationKey;
+  if (!instance || !getDecoration(key, area)) return;
+  const saved = save.decorations[area].find((item) => item.instance === instance);
+  if (saved) Object.assign(saved, point);
+  else save.decorations[area].push({ instance, key, x: point.x, y: point.y });
+  persist();
+}
+
+function applyWallpaperAtWall(variant) {
+  const saved = save.renovations.wallpaper;
+  if (!saved && !applyRenovation(save, 'wallpaper', variant)) {
+    showToast(copyFor(save.language).notEnough);
+    return false;
+  }
+  if (saved) saved.variant = variant;
+  activePlacement = null;
+  persist();
+  renderApp();
+  showToast(copyFor(save.language).wallpaperPlaced);
+  return true;
+}
+
+function attachSceneGestures(canvas, stage) {
+  let gesture = null;
+  canvas.addEventListener('pointerdown', (event) => {
+    if (event.button !== undefined && event.button !== 0) return;
+    const movable = event.target.closest?.('[data-scene-movable="true"]');
+    const rect = stage.getBoundingClientRect();
+    const itemRect = movable?.getBoundingClientRect();
+    gesture = { id: event.pointerId, x: event.clientX, y: event.clientY, mode: movable ? 'item' : 'pan', movable, rect,
+      offsetX: itemRect ? event.clientX - (itemRect.left + itemRect.width / 2) : 0,
+      offsetY: itemRect ? event.clientY - (itemRect.top + itemRect.height / 2) : 0,
+      startPan: { ...save.scenePan[save.activeScene] }, moved: false };
+    canvas.setPointerCapture?.(event.pointerId);
+    event.preventDefault();
+  });
+  canvas.addEventListener('pointermove', (event) => {
+    if (!gesture || gesture.id !== event.pointerId) return;
+    const dx = event.clientX - gesture.x;
+    const dy = event.clientY - gesture.y;
+    if (Math.max(Math.abs(dx), Math.abs(dy)) > 4) gesture.moved = true;
+    if (!gesture.moved) return;
+    if (gesture.mode === 'item') {
+      const point = pointOnScene(event.clientX - gesture.offsetX, event.clientY - gesture.offsetY, gesture.rect);
+      Object.assign(gesture.movable.style, { left: `${point.x}%`, top: `${point.y}%`, right: 'auto', bottom: 'auto', transform: 'translate(-50%, -50%)' });
+      gesture.movable.classList.add('is-being-moved');
+      gesture.point = point;
+    } else {
+      gesture.pan = panScene(gesture.startPan, dx, dy, window.innerWidth, window.innerHeight);
+      stage.style.setProperty('--scene-pan-x', `${gesture.pan.x * window.innerWidth}px`);
+      stage.style.setProperty('--scene-pan-y', `${gesture.pan.y * window.innerHeight}px`);
+    }
+  });
+  const finish = (event) => {
+    if (!gesture || gesture.id !== event.pointerId) return;
+    const done = gesture;
+    gesture = null;
+    if (done.mode === 'item' && done.moved && done.point) {
+      done.movable.classList.remove('is-being-moved');
+      saveSceneItemPosition(done.movable, save.activeScene, done.point);
+    } else if (done.mode === 'pan' && done.moved && done.pan) {
+      save.scenePan[save.activeScene] = done.pan;
+      persist();
+    } else if (done.mode === 'pan' && activePlacement?.type === 'wallpaper') {
+      const point = pointOnScene(event.clientX, event.clientY, stage.getBoundingClientRect());
+      if (save.activeScene === 'villa' && point.x >= 17 && point.x <= 96 && point.y >= 22 && point.y <= 69) applyWallpaperAtWall(activePlacement.variant);
+    }
+  };
+  canvas.addEventListener('pointerup', finish);
+  canvas.addEventListener('pointercancel', finish);
 }
 
 function renderApp() {
@@ -347,6 +470,27 @@ appRoot.addEventListener('click', (event) => {
     return;
   }
 
+  const wallpaperChoice = event.target.closest('[data-place-wallpaper]');
+  if (wallpaperChoice) {
+    activePlacement = { type: 'wallpaper', variant: wallpaperChoice.dataset.placeWallpaper };
+    renderApp();
+    return;
+  }
+
+  const decorationChoice = event.target.closest('[data-place-decoration]');
+  if (decorationChoice) {
+    const item = getDecoration(decorationChoice.dataset.placeDecoration, save.activeScene);
+    if (!item) return;
+    if (save.decorations[save.activeScene].length >= 60) { showToast(copyFor(save.language).decorLimit); return; }
+    const offset = (save.decorations[save.activeScene].length % 5) * 3;
+    save.decorations[save.activeScene].push({ instance: `placed-${item.id}-${Date.now()}-${Math.random().toString(36).slice(2, 7)}`, key: item.id, x: 50 + offset, y: save.activeScene === 'garden' ? 62 - offset : 76 - offset });
+    activePlacement = null;
+    persist();
+    renderApp();
+    showToast(copyFor(save.language).decorAdded);
+    return;
+  }
+
   const playButton = event.target.closest('#playMatch3');
   if (playButton) { startMatch3(); return; }
 
@@ -374,6 +518,19 @@ appRoot.addEventListener('click', (event) => {
     renderApp();
     showToast(copyFor(save.language).renovated);
   }
+});
+
+appRoot.addEventListener('keydown', (event) => {
+  const movable = event.target.closest?.('[data-scene-movable="true"]');
+  if (!movable || !['ArrowUp', 'ArrowDown', 'ArrowLeft', 'ArrowRight'].includes(event.key)) return;
+  event.preventDefault();
+  const rect = movable.closest('.diorama').getBoundingClientRect();
+  const x = Number.parseFloat(movable.style.left) || 50;
+  const y = Number.parseFloat(movable.style.top) || 50;
+  const delta = event.shiftKey ? 5 : 1;
+  const next = { x: clampScenePosition(x + (event.key === 'ArrowLeft' ? -delta : event.key === 'ArrowRight' ? delta : 0)), y: clampScenePosition(y + (event.key === 'ArrowUp' ? -delta : event.key === 'ArrowDown' ? delta : 0)) };
+  Object.assign(movable.style, { left: `${next.x}%`, top: `${next.y}%`, right: 'auto', bottom: 'auto', transform: 'translate(-50%, -50%)' });
+  saveSceneItemPosition(movable, save.activeScene, next);
 });
 
 window.addEventListener('keydown', (event) => {

@@ -22,6 +22,11 @@ const COPY = {
     visitGarden: 'Zum Garten', visitVilla: 'In die Villa', retry: 'Level erneut spielen', close: 'Schließen',
     openRenovation: 'Im Vollbild renovieren', backToEstate: 'Zurück zum Anwesen',
     closeTasks: 'Aufgaben schließen', openTasks: 'Aufgaben öffnen',
+    decorHeading: 'Möbel & Deko frei platzieren', decorHelp: 'Tippe einen Gegenstand zum Einsetzen an, ziehe ihn danach an deinen Wunschplatz. Wische über freie Fläche, um dich umzusehen.',
+    wallpaperTool: 'Tapete direkt anbringen', wallpaperHint: 'Wähle ein Muster und tippe dann auf die Wand.', wallpaperPlaced: 'Die Tapete wurde an der Wand angebracht.',
+    decorAdded: 'Gegenstand platziert. Ziehe ihn an deinen Wunschplatz.', decorLimit: 'Hier können höchstens 60 Deko-Gegenstände stehen.',
+    decorOak: 'Eiche', decorCherry: 'Kirschbaum', decorFlowers: 'Wiesenblumen', decorSunflowers: 'Sonnenblumen', decorBush: 'Strauch', decorBench: 'Gartenbank', decorFountain: 'Brunnen',
+    decorSofa: 'Sofa', decorRug: 'Teppich', decorCurtains: 'Vorhänge', decorFireplace: 'Kamin', decorPlant: 'Blumentopf', decorFrame: 'Wandbild',
   },
   'pt-BR': {
     title: 'Jardim Particular de Gertrudes Greinwald', tagline: 'Sua casa. Suas escolhas.',
@@ -46,6 +51,11 @@ const COPY = {
     visitGarden: 'Ir ao jardim', visitVilla: 'Entrar na vila', retry: 'Jogar a fase novamente', close: 'Fechar',
     openRenovation: 'Reformar em tela cheia', backToEstate: 'Voltar à propriedade',
     closeTasks: 'Fechar tarefas', openTasks: 'Abrir tarefas',
+    decorHeading: 'Móveis e decoração', decorHelp: 'Toque em um item para colocá-lo e arraste até o local desejado. Arraste uma área livre para explorar.',
+    wallpaperTool: 'Aplicar papel de parede', wallpaperHint: 'Escolha um padrão e toque na parede.', wallpaperPlaced: 'O papel de parede foi aplicado.',
+    decorAdded: 'Item colocado. Arraste até o local desejado.', decorLimit: 'É possível colocar até 60 itens de decoração nesta cena.',
+    decorOak: 'Carvalho', decorCherry: 'Cerejeira', decorFlowers: 'Flores do campo', decorSunflowers: 'Girassóis', decorBush: 'Arbusto', decorBench: 'Banco de jardim', decorFountain: 'Fonte',
+    decorSofa: 'Sofá', decorRug: 'Tapete', decorCurtains: 'Cortinas', decorFireplace: 'Lareira', decorPlant: 'Vaso de flores', decorFrame: 'Quadro',
   },
 };
 

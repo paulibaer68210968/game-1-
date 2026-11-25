@@ -331,6 +331,9 @@ body.is-renovation-fullscreen { overflow: hidden; }
 }
 .fullscreen-scene-canvas { position: absolute; inset: 0; overflow: hidden; }
 .fullscreen-scene-canvas .diorama { width: 100%; height: 100%; aspect-ratio: auto; }
+.fullscreen-scene-canvas .diorama.is-pannable { position: absolute; top: -20svh; left: -20vw; width: 140vw; height: 140svh; transform: translate(var(--scene-pan-x, 0px), var(--scene-pan-y, 0px)); transform-origin: center; touch-action: none; }
+.fullscreen-scene-canvas .diorama.is-pannable::before,
+.fullscreen-scene-canvas .diorama.is-pannable::after { pointer-events: none; }
 .fullscreen-scene-canvas .scene-caption-tag { display: none; }
 .fullscreen-topbar {
   position: absolute;
@@ -421,6 +424,30 @@ body.is-renovation-fullscreen { overflow: hidden; }
 .game-toast { z-index: 140; }
 
 .renovation-sprite { position: absolute; z-index: 5; display: block; object-fit: contain; image-rendering: auto; pointer-events: none; filter: drop-shadow(0 8px 7px rgba(36, 42, 30, .22)); }
+.scene-movable { pointer-events: auto; touch-action: none; cursor: grab; }
+.scene-movable:active, .scene-movable.is-being-moved { z-index: 12; cursor: grabbing; filter: drop-shadow(0 12px 9px rgba(25, 31, 20, .4)); }
+.placed-decoration { z-index: 8; }
+.decor-oak, .decor-cherry { width: 28%; height: 37%; }
+.decor-flowers, .decor-sunflowers { width: 22%; height: 19%; }
+.decor-bush { width: 18%; height: 20%; }
+.decor-bench { width: 27%; height: 23%; }
+.decor-fountain { width: 22%; height: 22%; }
+.decor-sofa { width: 35%; height: 31%; }
+.decor-rug { width: 30%; height: 16%; }
+.decor-curtains, .decor-frame { width: 24%; height: 26%; }
+.decor-fireplace { width: 25%; height: 28%; }
+.decor-plant { width: 16%; height: 21%; }
+.placement-tools { padding: 12px 0 4px; border-top: 1px solid #e5dcc7; }
+.placement-tools h3 { margin: 0 0 4px; color: #465b3e; font-size: 13px; }
+.placement-help { margin: 0 0 8px; color: #727966; font-size: 10px; line-height: 1.35; }
+.wallpaper-tools { display: flex; align-items: center; flex-wrap: wrap; gap: 5px; margin: 7px 0; }
+.wallpaper-tools strong { flex: 1 0 100%; color: #59684e; font-size: 10px; }
+.wallpaper-choice { min-height: 32px; padding: 0 9px; border: 1px solid #d6c9a9; border-radius: 99px; background: #fffaf0; font-size: 10px; font-weight: 750; touch-action: manipulation; }
+.wallpaper-choice.is-selected { border-color: #75915f; background: #e4eed7; }
+.decoration-tray { display: flex; gap: 7px; overflow-x: auto; padding: 2px 1px 7px; scrollbar-width: thin; }
+.decoration-choice { display: grid; min-width: 70px; min-height: 68px; flex: 0 0 70px; justify-items: center; gap: 3px; padding: 5px; border: 1px solid #ddd2b8; border-radius: 11px; color: #56644e; background: rgba(255,255,255,.72); font-size: 9px; font-weight: 750; touch-action: manipulation; }
+.decoration-choice img { width: 38px; height: 38px; object-fit: contain; }
+.decoration-choice span { white-space: nowrap; }
 .scene-garden-path { position: absolute; z-index: 2; bottom: 18%; left: 39%; display: none; width: 22%; height: 49%; clip-path: polygon(43% 0, 57% 0, 96% 100%, 4% 100%); background: repeating-linear-gradient(165deg, #b8ad91 0 8px, #d6c8a7 9px 19px, #a89b7d 20px 22px); filter: drop-shadow(0 5px 5px rgba(44, 42, 31, .32)); }
 .has-path .scene-garden-path { display: block; }
 .path-moss .scene-garden-path { background: repeating-linear-gradient(165deg, #939b7d 0 8px, #c2c5a7 9px 19px, #81896d 20px 22px); }

@@ -9,6 +9,13 @@ import {
   renovationVariant,
   tasksForArea,
 } from '../src/progression.js';
+import {
+  SCENE_PAN_LIMIT,
+  clampScenePosition,
+  normalizeScenePan,
+  panScene,
+  pointOnScene,
+} from '../src/scene-placement.js';
 
 function makeSave(stars = 10) {
   return { stars, renovations: {} };
@@ -66,4 +73,17 @@ test('applyRenovation rejects unknown ids, insufficient stars and completed task
 test('the renovation catalogue exposes positive whole-star costs', () => {
   assert.ok(RENOVATIONS.length > 0);
   for (const task of RENOVATIONS) assert.ok(Number.isInteger(task.cost) && task.cost > 0);
+});
+
+test('scene item positions are finite and stay inside the visible world', () => {
+  assert.equal(clampScenePosition(-20), 4);
+  assert.equal(clampScenePosition(140), 96);
+  assert.equal(clampScenePosition(Number.NaN), 50);
+  assert.deepEqual(pointOnScene(250, 150, { left: 100, top: 50, width: 200, height: 200 }), { x: 75, y: 50 });
+});
+
+test('scene panning is normalized and clamped to a reachable range', () => {
+  assert.deepEqual(panScene({ x: 0, y: 0 }, 100, -50, 1000, 500), { x: 0.1, y: -0.1 });
+  assert.deepEqual(panScene({ x: 0.14, y: -0.14 }, 500, -500, 1000, 1000), { x: SCENE_PAN_LIMIT, y: -SCENE_PAN_LIMIT });
+  assert.deepEqual(normalizeScenePan({ x: 4, y: -4 }), { x: SCENE_PAN_LIMIT, y: -SCENE_PAN_LIMIT });
 });
