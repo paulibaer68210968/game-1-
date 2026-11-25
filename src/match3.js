@@ -24,7 +24,7 @@ const ORIGINAL_BOARD = [
 const TEXT = {
   de: {
     levelLabel: 'Level',
-    title: 'Edelstein-Garten', subtitle: 'Vierer, Fünfer und Ecken formen Spezialsteine. Tausche benachbarte Steine per Tipp oder Wisch.',
+    title: 'Edelstein-Garten', instructionsTitle: 'Spielregeln & Tipp', subtitle: 'Vierer, Fünfer und Ecken formen Spezialsteine. Tausche benachbarte Steine per Tipp oder Wisch.',
     back: 'Zurück', moves: 'Züge', goal: 'Ziel', collected: 'Gesammelt', hint: 'Wähle zwei benachbarte Steine zum Tauschen.',
     selected: (color, row, col) => `${color}, Reihe ${row}, Spalte ${col} ausgewählt. Wähle einen benachbarten Stein.`,
     invalid: 'Dort entsteht keine Reihe – der Tausch wurde zurückgesetzt.',
@@ -41,7 +41,7 @@ const TEXT = {
   },
   'pt-BR': {
     levelLabel: 'Nível',
-    title: 'Jardim de Gemas', subtitle: 'Sequências de 4, 5 e cruzamentos criam gemas especiais. Toque ou deslize para trocar pedras vizinhas.',
+    title: 'Jardim de Gemas', instructionsTitle: 'Como jogar', subtitle: 'Sequências de 4, 5 e cruzamentos criam gemas especiais. Toque ou deslize para trocar pedras vizinhas.',
     back: 'Voltar', moves: 'Jogadas', goal: 'Meta', collected: 'Coletadas', hint: 'Escolha duas pedras vizinhas para trocar.',
     selected: (color, row, col) => `${color}, linha ${row}, coluna ${col} selecionada. Escolha uma pedra vizinha.`,
     invalid: 'Essa troca não formou uma sequência e foi desfeita.',
@@ -206,7 +206,10 @@ export function mountMatch3(container, { level = 1, language = 'de', extraTools 
         <div class="match3-heading"><p class="match3-kicker"></p><h1 class="match3-title" id="${titleId}"></h1></div>
         <button class="match3-back" type="button"></button>
       </header>
-      <p class="match3-subtitle"></p>
+      <details class="match3-instructions">
+        <summary class="match3-instructions-toggle"></summary>
+        <p class="match3-subtitle"></p>
+      </details>
       <div class="match3-stats" aria-label="">
         <div class="match3-stat"><span class="match3-stat-label match3-moves-label"></span><strong class="match3-moves-value"></strong></div>
         <div class="match3-stat match3-goal-stat"><span class="match3-stat-label match3-goal-label"></span><span class="match3-goal-line"><span class="match3-target-gem" aria-hidden="true"></span><strong class="match3-goal-value"></strong></span></div>
@@ -214,10 +217,10 @@ export function mountMatch3(container, { level = 1, language = 'de', extraTools 
       </div>
       <div class="match3-progress" role="progressbar" aria-valuemin="0" aria-valuemax="${targetCount}" aria-valuenow="0"><span class="match3-progress-fill"></span></div>
       <div class="match3-board" role="grid" aria-label=""></div>
-      <section class="match3-power-guide" aria-label="">
-        <strong class="match3-guide-title"></strong>
+      <details class="match3-power-guide" aria-label="">
+        <summary class="match3-guide-title"></summary>
         <div class="match3-power-list"></div>
-      </section>
+      </details>
       <section class="match3-booster-panel" aria-label="">
         <strong class="match3-booster-title"></strong>
         <div class="match3-booster-list">
@@ -328,6 +331,7 @@ export function mountMatch3(container, { level = 1, language = 'de', extraTools 
     const text = TEXT[locale];
     $('.match3-kicker').textContent = `${text.levelLabel} ${safeLevel}`;
     $('.match3-title').textContent = text.title;
+    $('.match3-instructions-toggle').textContent = text.instructionsTitle;
     $('.match3-subtitle').textContent = text.subtitle;
     $('.match3-back').textContent = text.back;
     $('.match3-moves-label').textContent = text.moves;

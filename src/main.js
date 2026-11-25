@@ -23,6 +23,7 @@ const match3Root = document.querySelector('#match3Root');
 let match3 = null;
 let toastTimer = null;
 const selectedVariants = new Map();
+const expandedTasks = new Set();
 
 function validLanguage(language) {
   return language === 'pt-BR' ? 'pt-BR' : 'de';
@@ -110,8 +111,12 @@ function taskImage(id) {
 }
 
 function renderTaskCard(task, copy) {
-  const card = document.createElement('article');
-  card.className = `renovation-card${isRenovated(save, task.id) ? ' is-complete' : ''}`;
+  const complete = isRenovated(save, task.id);
+  const card = document.createElement('details');
+  card.className = `renovation-card${complete ? ' is-complete' : ''}`;
+  card.open = !complete && expandedTasks.has(task.id);
+  const summary = document.createElement('summary');
+  summary.className = 'renovation-summary';
   const icon = document.createElement('img');
   icon.className = 'renovation-icon';
   icon.src = taskImage(task.id);
@@ -121,18 +126,31 @@ function renderTaskCard(task, copy) {
   details.className = 'renovation-details';
   const heading = document.createElement('h3');
   heading.textContent = copy[task.title];
-  const description = document.createElement('p');
-  description.textContent = copy[task.description];
-  details.append(heading, description);
-  card.append(icon, details);
+  details.append(heading);
+  summary.append(icon, details);
 
-  if (isRenovated(save, task.id)) {
+  if (complete) {
     const completed = document.createElement('span');
     completed.className = 'renovation-complete';
     completed.textContent = copy.done;
-    card.appendChild(completed);
+    summary.appendChild(completed);
+    card.appendChild(summary);
     return card;
   }
+
+  const cost = document.createElement('span');
+  cost.className = 'renovation-cost';
+  cost.textContent = `${task.cost} ★`;
+  summary.appendChild(cost);
+  summary.setAttribute('aria-expanded', String(card.open));
+  card.appendChild(summary);
+
+  const panel = document.createElement('div');
+  panel.className = 'renovation-panel';
+  const description = document.createElement('p');
+  description.className = 'renovation-description';
+  description.textContent = copy[task.description];
+  panel.appendChild(description);
 
   const selected = selectedVariants.get(task.id) || initialVariant(task);
   if (task.variants.length > 1) {
@@ -150,7 +168,7 @@ function renderTaskCard(task, copy) {
       choice.textContent = copy[variant.label];
       choices.appendChild(choice);
     }
-    card.appendChild(choices);
+    panel.appendChild(choices);
   }
 
   const action = document.createElement('button');
@@ -158,7 +176,13 @@ function renderTaskCard(task, copy) {
   action.className = 'renovate-button';
   action.dataset.renovate = task.id;
   action.textContent = `${copy.renovate} · ${task.cost} ★`;
-  card.appendChild(action);
+  panel.appendChild(action);
+  card.appendChild(panel);
+  card.addEventListener('toggle', () => {
+    if (card.open) expandedTasks.add(task.id);
+    else expandedTasks.delete(task.id);
+    summary.setAttribute('aria-expanded', String(card.open));
+  });
   return card;
 }
 
@@ -181,8 +205,10 @@ function renderApp() {
         <button class="language-button" id="languageButton" type="button" aria-label="${copy.language}">${save.language === 'de' ? 'DE' : 'PT'}</button>
       </header>
       <section class="status-strip" aria-label="${copy.level}, ${copy.stars}">
-        <div class="status-pill level-pill"><span class="status-symbol" aria-hidden="true">✿</span><span><small>${copy.level}</small><strong>${save.puzzleLevel}</strong></span></div>
-        <div class="status-pill star-pill"><span class="status-symbol" aria-hidden="true">★</span><span><small>${copy.stars}</small><strong>${save.stars}</strong></span></div>
+        <div class="status-group">
+          <div class="status-pill level-pill"><span class="status-symbol" aria-hidden="true">✿</span><span><small>${copy.level}</small><strong>${save.puzzleLevel}</strong></span></div>
+          <div class="status-pill star-pill"><span class="status-symbol" aria-hidden="true">★</span><span><small>${copy.stars}</small><strong>${save.stars}</strong></span></div>
+        </div>
         <button class="play-button" id="playMatch3" type="button"><span class="play-button-icon" aria-hidden="true">◆</span><span><small>${copy.nextPuzzle} ${save.puzzleLevel}</small><strong>${copy.play}</strong></span><span class="play-arrow" aria-hidden="true">›</span></button>
       </section>
       <main class="home-content">
@@ -265,6 +291,7 @@ appRoot.addEventListener('click', (event) => {
   const choice = event.target.closest('[data-variant][data-task]');
   if (choice) {
     selectedVariants.set(choice.dataset.task, choice.dataset.variant);
+    expandedTasks.add(choice.dataset.task);
     renderApp();
     return;
   }
@@ -279,7 +306,8 @@ appRoot.addEventListener('click', (event) => {
       showToast(copyFor(save.language).notEnough);
       return;
     }
-    selectedVariants.delete(task.id);
+    selectedVariants.delete(taskId);
+    expandedTasks.delete(taskId);
     persist();
     renderApp();
     showToast(copyFor(save.language).renovated);
