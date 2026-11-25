@@ -3,6 +3,8 @@
 ## 1. 2D-Anwesen mit fingerbedientem Garten- und Villenausbau
 - Der Nutzer wählte die Richtung „Match‑3-Gartenaufbau neu gestalten“ und ergänzte: „2 D reicht ist auch besser sichtbar...als Erfolge eben Villa und Gärten Ausbau...Möbel, Tapeten, Pflanzen und Werkzeuge“.
 - Erlaubt ist, den bisherigen Three.js-Spielablauf umfassend zu ersetzen. Das aktive Spiel zeigt ein eigenes, gut sichtbares 2D-Anwesen mit Garten und Villa; keine freie 3D-Bewegung, Tastatur, Maus oder virtueller Joystick werden vorausgesetzt.
+- Zum Renovieren öffnet sich der gewählte Garten oder die Villa im Vollbild; die Szene füllt nahezu das gesamte Display, und Zurück sowie der Wechsel zwischen den Bereichen bleiben erreichbar.
+- Das Gesamtbild von Szene und Oberfläche wird natürlicher und realistischer mit mehr Materialdetails, Licht und Tiefe, bleibt aber eine gut lesbare, fingerbedienbare 2D-Spielwelt.
 - Die Szene zeigt mehrere freischaltbare bzw. aufwertbare Elemente in beiden Bereichen: Gartenwege/Beete/Pflanzen sowie Villawände/Tapeten und Möbel; Werkzeuge sind sichtbare Spielgegenstände bzw. Match‑3-Hilfen.
 - Der Nutzer bedient die App nur mit Fingern: tippt Navigation, Aufgaben und Dekorationsauswahl an und tauscht Match‑3-Steine per Tippen oder Wischen. Oberfläche und Spielfeld passen in Hochkant-Smartphone-Ansichten; Status-/Aufgabenflächen sind kompakt und nicht so groß wie die zuvor kritisierten Tablet-Buttons, während interaktive Touchflächen gut erreichbar bleiben.
 - Das Ergebnis bleibt eigenständig: Name und Welt „Gertrudes Greinwald privater Garten“ bleiben erhalten; Gardenscapes ist Genre-/Ablaufinspiration, nicht eine Vorlage zum Kopieren von Figuren, Assets, Texten, Szenen oder konkretem UI.

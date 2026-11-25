@@ -8,7 +8,7 @@ const COPY = {
     available: 'Auswählen', renovate: 'Renovieren', done: 'Erledigt', cost: 'Kosten',
     notEnough: 'Dafür fehlen noch Sterne. Gewinne ein Match‑3-Level und versuche es wieder.',
     renovated: 'Das sieht schon viel gemütlicher aus.', reward: 'Ein Stern für dein Zuhause!', language: 'Sprache wechseln',
-    houseAlt: 'Die helle Villa am Ende des Gartens', gardenAlt: 'Isometrischer Garten mit Blumen und Obstbäumen', villaAlt: 'Gemütliches Wohnzimmer mit Möbeln und Tapete',
+    houseAlt: 'Die helle Villa am Ende des Gartens', gardenAlt: 'Realistisch illustrierter Garten mit Villa und freier Rasenfläche', villaAlt: 'Realistisch illustriertes Wohnzimmer mit heller Tapete und Holzboden',
     pathTitle: 'Den Gartenweg freilegen', pathDesc: 'Räume die überwucherten Trittsteine frei.', pathMoss: 'Moosstein', pathAmber: 'Warmer Sandstein',
     flowersTitle: 'Ein neues Blumenbeet anlegen', flowersDesc: 'Such dir aus, was am Weg blühen soll.', flowersSunflower: 'Sonnenblumen', flowersWild: 'Wiesenblumen',
     treeTitle: 'Einen Lieblingsbaum pflanzen', treeDesc: 'Ein blühender Kirschbaum oder eine grüne Eiche?', treeCherry: 'Kirschblüte', treeOak: 'Alte Eiche',
@@ -20,6 +20,7 @@ const COPY = {
     fireplaceTitle: 'Den Kamin wieder wärmen', fireplaceDesc: 'Ein knisterndes Feuer macht die Villa gleich wohnlicher.', fireplaceWarm: 'Kaminfeuer',
     noRenovations: 'Hier ist noch alles zu entdecken.', sceneGarden: 'Gartenansicht', sceneVilla: 'Wohnzimmeransicht',
     visitGarden: 'Zum Garten', visitVilla: 'In die Villa', retry: 'Level erneut spielen', close: 'Schließen',
+    openRenovation: 'Im Vollbild renovieren', backToEstate: 'Zurück zum Anwesen',
   },
   'pt-BR': {
     title: 'Jardim Particular de Gertrudes Greinwald', tagline: 'Sua casa. Suas escolhas.',
@@ -30,7 +31,7 @@ const COPY = {
     available: 'Escolher', renovate: 'Reformar', done: 'Concluído', cost: 'Custo',
     notEnough: 'Ainda faltam estrelas. Vença uma fase de Match‑3 e tente novamente.',
     renovated: 'A casa já está ficando mais aconchegante.', reward: 'Uma estrela para sua casa!', language: 'Trocar idioma',
-    houseAlt: 'A vila clara no fim do jardim', gardenAlt: 'Jardim isométrico com flores e árvores frutíferas', villaAlt: 'Sala aconchegante com móveis e papel de parede',
+    houseAlt: 'A vila clara no fim do jardim', gardenAlt: 'Jardim ilustrado com aparência natural, uma vila e gramado aberto', villaAlt: 'Sala ilustrada com aparência natural, papel de parede claro e piso de madeira',
     pathTitle: 'Revelar o caminho do jardim', pathDesc: 'Liberte as pedras que cresceram entre as plantas.', pathMoss: 'Pedra com musgo', pathAmber: 'Pedra dourada',
     flowersTitle: 'Criar um novo canteiro', flowersDesc: 'Escolha o que vai florescer perto do caminho.', flowersSunflower: 'Girassóis', flowersWild: 'Flores do campo',
     treeTitle: 'Plantar uma árvore especial', treeDesc: 'Uma cerejeira florida ou um carvalho verde?', treeCherry: 'Cerejeira', treeOak: 'Carvalho antigo',
@@ -42,6 +43,7 @@ const COPY = {
     fireplaceTitle: 'Acender a lareira', fireplaceDesc: 'Um fogo crepitante deixa a vila mais acolhedora.', fireplaceWarm: 'Fogo aceso',
     noRenovations: 'Ainda há muito para descobrir por aqui.', sceneGarden: 'Vista do jardim', sceneVilla: 'Vista da sala',
     visitGarden: 'Ir ao jardim', visitVilla: 'Entrar na vila', retry: 'Jogar a fase novamente', close: 'Fechar',
+    openRenovation: 'Reformar em tela cheia', backToEstate: 'Voltar à propriedade',
   },
 };
 

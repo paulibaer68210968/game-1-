@@ -21,6 +21,7 @@ const DEFAULT_SAVE = Object.freeze({
 const appRoot = document.querySelector('#gameRoot');
 const match3Root = document.querySelector('#match3Root');
 let match3 = null;
+let renovationFullscreen = false;
 let toastTimer = null;
 const selectedVariants = new Map();
 const expandedTasks = new Set();
@@ -98,14 +99,14 @@ function showToast(message) {
 function taskImage(id) {
   const sources = {
     path: ART.bush,
-    flowers: ART.flowerBed,
-    tree: save.renovations.tree?.variant === 'oak' ? ART.oakTree : ART.cherryTree,
-    bench: ART.sofa,
-    fountain: ART.flowerBed,
+    flowers: save.renovations.flowers?.variant === 'sunflower' ? ART.renovatedSunflowers : ART.renovatedWildflowers,
+    tree: save.renovations.tree?.variant === 'oak' ? ART.renovatedOak : ART.renovatedCherry,
+    bench: ART.renovatedBench,
+    fountain: ART.renovatedFountain,
     shed: ART.shovel,
     wallpaper: ART.windowFrame,
-    sofa: ART.sofa,
-    fireplace: ART.fireplace,
+    sofa: ART.renovatedSofa,
+    fireplace: ART.renovatedFireplace,
   };
   return sources[id] || ART.flowerBed;
 }
@@ -193,10 +194,43 @@ function renderTasks(copy) {
   for (const task of tasks) taskList.appendChild(renderTaskCard(task, copy));
 }
 
+function renderFullscreen(copy, currentIsGarden) {
+  appRoot.innerHTML = `
+    <section class="renovation-fullscreen" role="dialog" aria-modal="true" aria-labelledby="fullscreenTitle">
+      <div id="fullscreenSceneCanvas" class="fullscreen-scene-canvas"></div>
+      <header class="fullscreen-topbar">
+        <div class="fullscreen-topline">
+          <button class="fullscreen-back" type="button" data-exit-fullscreen aria-label="${copy.backToEstate}"><span aria-hidden="true">‹</span><small>${copy.backToEstate}</small></button>
+          <div class="fullscreen-title-block"><p class="fullscreen-kicker">${copy.title}</p><h1 id="fullscreenTitle">${currentIsGarden ? copy.gardenScene : copy.villaScene}</h1></div>
+          <div class="fullscreen-stars" aria-label="${copy.stars}: ${save.stars}"><span aria-hidden="true">★</span><strong>${save.stars}</strong></div>
+        </div>
+        <div class="fullscreen-area-tabs" role="group" aria-label="${copy.sceneGarden} / ${copy.sceneVilla}">
+          <button type="button" data-scene="garden" aria-pressed="${currentIsGarden}">${copy.garden}</button>
+          <button type="button" data-scene="villa" aria-pressed="${!currentIsGarden}">${copy.villa}</button>
+        </div>
+      </header>
+      <section class="fullscreen-task-panel" aria-labelledby="taskHeading">
+        <div class="fullscreen-panel-grip" aria-hidden="true"></div>
+        <div class="renovation-heading"><div><p class="section-kicker">${currentIsGarden ? copy.gardenTasks : copy.villaTasks}</p><h2 id="taskHeading">${copy.taskHeading}</h2></div><span class="star-reminder">★ ${save.stars}</span></div>
+        <p class="task-hint">${copy.taskHint}</p>
+        <div class="task-list" id="taskList"></div>
+      </section>
+      <div class="game-toast" id="gameToast" role="status" aria-live="polite" aria-atomic="true"></div>
+    </section>`;
+  renderGardenScene(appRoot.querySelector('#fullscreenSceneCanvas'), save, save.language);
+  renderTasks(copy);
+}
+
 function renderApp() {
   if (!appRoot) return;
   const copy = copyFor(save.language);
   const currentIsGarden = save.activeScene === 'garden';
+  if (renovationFullscreen) {
+    document.body.classList.add('is-renovation-fullscreen');
+    renderFullscreen(copy, currentIsGarden);
+    return;
+  }
+  document.body.classList.remove('is-renovation-fullscreen');
   appRoot.innerHTML = `
     <div class="app-shell">
       <header class="app-header">
@@ -221,7 +255,7 @@ function renderApp() {
             </div>
           </div>
           <div id="sceneCanvas" class="scene-canvas"></div>
-          <p class="scene-caption">${currentIsGarden ? copy.gardenCaption : copy.villaCaption}</p>
+          <div class="scene-preview-footer"><p class="scene-caption">${currentIsGarden ? copy.gardenCaption : copy.villaCaption}</p><button id="openFullscreen" class="scene-open-button" type="button" data-open-fullscreen><span aria-hidden="true">⛶</span>${copy.openRenovation}</button></div>
         </section>
         <section class="renovation-section" aria-labelledby="taskHeading">
           <div class="renovation-heading"><div><p class="section-kicker">${currentIsGarden ? copy.gardenTasks : copy.villaTasks}</p><h2 id="taskHeading">${copy.taskHeading}</h2></div><span class="star-reminder">★ ${save.stars}</span></div>
@@ -264,6 +298,22 @@ function startMatch3() {
 }
 
 appRoot.addEventListener('click', (event) => {
+  const exitFullscreen = event.target.closest('[data-exit-fullscreen]');
+  if (exitFullscreen) {
+    renovationFullscreen = false;
+    renderApp();
+    appRoot.querySelector('#openFullscreen')?.focus({ preventScroll: true });
+    return;
+  }
+
+  const openFullscreen = event.target.closest('[data-open-fullscreen]');
+  if (openFullscreen) {
+    renovationFullscreen = true;
+    renderApp();
+    appRoot.querySelector('[data-exit-fullscreen]')?.focus({ preventScroll: true });
+    return;
+  }
+
   const languageButton = event.target.closest('#languageButton');
   if (languageButton) {
     save.language = save.language === 'de' ? 'pt-BR' : 'de';
@@ -279,6 +329,7 @@ appRoot.addEventListener('click', (event) => {
     if (scene === 'puzzle') { startMatch3(); return; }
     if (scene === 'garden' || scene === 'villa') {
       save.activeScene = scene;
+      if (sceneButton.matches('[data-nav]')) renovationFullscreen = true;
       persist();
       renderApp();
     }
@@ -312,6 +363,12 @@ appRoot.addEventListener('click', (event) => {
     renderApp();
     showToast(copyFor(save.language).renovated);
   }
+});
+
+window.addEventListener('keydown', (event) => {
+  if (event.key !== 'Escape' || !renovationFullscreen) return;
+  renovationFullscreen = false;
+  renderApp();
 });
 
 renderApp();

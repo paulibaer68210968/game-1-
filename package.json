@@ -6,8 +6,8 @@
   "description": "Eigenständiges fingerbedientes 2D-Match-3-Renovierungsspiel für Android und Browser",
   "packageManager": "pnpm@11.25.0",
   "scripts": {
-    "build": "esbuild src/main.js --bundle --format=esm --target=es2020 --outfile=game.bundle.js --minify --legal-comments=external --loader:.ttf=file --loader:.png=file --asset-names=assets/[name]-[hash] && node scripts/prepare-capacitor.mjs",
-    "build:web": "esbuild src/main.js --bundle --format=esm --target=es2020 --outfile=game.bundle.js --minify --legal-comments=external --loader:.ttf=file --loader:.png=file --asset-names=assets/[name]-[hash]",
+    "build": "esbuild src/main.js --bundle --format=esm --target=es2020 --outfile=game.bundle.js --minify --legal-comments=external --loader:.ttf=file --loader:.png=file --loader:.jpg=file --loader:.webp=file --asset-names=assets/[name]-[hash] && node scripts/prepare-capacitor.mjs",
+    "build:web": "esbuild src/main.js --bundle --format=esm --target=es2020 --outfile=game.bundle.js --minify --legal-comments=external --loader:.ttf=file --loader:.png=file --loader:.jpg=file --loader:.webp=file --asset-names=assets/[name]-[hash]",
     "cap": "cap",
     "android:add": "cap add android",
     "android:sync": "cap sync android",
