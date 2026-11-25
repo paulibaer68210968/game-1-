@@ -22,6 +22,7 @@ const appRoot = document.querySelector('#gameRoot');
 const match3Root = document.querySelector('#match3Root');
 let match3 = null;
 let renovationFullscreen = false;
+let fullscreenTasksCollapsed = false;
 let toastTimer = null;
 const selectedVariants = new Map();
 const expandedTasks = new Set();
@@ -209,11 +210,13 @@ function renderFullscreen(copy, currentIsGarden) {
           <button type="button" data-scene="villa" aria-pressed="${!currentIsGarden}">${copy.villa}</button>
         </div>
       </header>
-      <section class="fullscreen-task-panel" aria-labelledby="taskHeading">
-        <div class="fullscreen-panel-grip" aria-hidden="true"></div>
-        <div class="renovation-heading"><div><p class="section-kicker">${currentIsGarden ? copy.gardenTasks : copy.villaTasks}</p><h2 id="taskHeading">${copy.taskHeading}</h2></div><span class="star-reminder">★ ${save.stars}</span></div>
-        <p class="task-hint">${copy.taskHint}</p>
-        <div class="task-list" id="taskList"></div>
+      <section class="fullscreen-task-panel${fullscreenTasksCollapsed ? ' is-collapsed' : ''}" aria-label="${currentIsGarden ? copy.gardenTasks : copy.villaTasks}">
+        <button class="fullscreen-panel-toggle" type="button" data-toggle-task-panel aria-controls="fullscreen-task-content" aria-expanded="${!fullscreenTasksCollapsed}"><span aria-hidden="true">${fullscreenTasksCollapsed ? '⌃' : '⌄'}</span>${fullscreenTasksCollapsed ? copy.openTasks : copy.closeTasks}</button>
+        <div class="fullscreen-task-content" id="fullscreen-task-content"${fullscreenTasksCollapsed ? ' hidden' : ''}>
+          <div class="renovation-heading"><div><p class="section-kicker">${currentIsGarden ? copy.gardenTasks : copy.villaTasks}</p><h2 id="taskHeading">${copy.taskHeading}</h2></div><span class="star-reminder">★ ${save.stars}</span></div>
+          <p class="task-hint">${copy.taskHint}</p>
+          <div class="task-list" id="taskList"></div>
+        </div>
       </section>
       <div class="game-toast" id="gameToast" role="status" aria-live="polite" aria-atomic="true"></div>
     </section>`;
@@ -303,6 +306,14 @@ appRoot.addEventListener('click', (event) => {
     renovationFullscreen = false;
     renderApp();
     appRoot.querySelector('#openFullscreen')?.focus({ preventScroll: true });
+    return;
+  }
+
+  const taskPanelToggle = event.target.closest('[data-toggle-task-panel]');
+  if (taskPanelToggle) {
+    fullscreenTasksCollapsed = !fullscreenTasksCollapsed;
+    renderApp();
+    appRoot.querySelector('[data-toggle-task-panel]')?.focus({ preventScroll: true });
     return;
   }
 

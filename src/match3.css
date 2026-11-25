@@ -9,6 +9,8 @@
   position: fixed;
   z-index: 10000;
   inset: 0;
+  min-height: 100svh;
+  min-height: 100dvh;
   display: grid;
   grid-template-columns: minmax(0, 1fr);
   align-content: start;
@@ -19,7 +21,7 @@
   overflow-y: auto;
   overscroll-behavior: contain;
   -webkit-overflow-scrolling: touch;
-  padding: max(14px, env(safe-area-inset-top)) 14px max(18px, env(safe-area-inset-bottom));
+  padding: max(5px, env(safe-area-inset-top)) 5px max(5px, env(safe-area-inset-bottom));
   color: var(--match3-ink);
   background: radial-gradient(ellipse at 50% 20%, rgba(247, 244, 203, .58), transparent 58%), rgba(28, 43, 29, .74);
   font-family: Georgia, 'Times New Roman', serif;
@@ -33,7 +35,10 @@
 }
 
 .match3-card {
-  width: min(100%, 520px);
+  width: min(96vw, 620px);
+  min-height: 92svh;
+  min-height: 92dvh;
+  margin: auto;
   padding: clamp(16px, 3vw, 27px);
   border: 3px solid #a98955;
   border-radius: 24px;
@@ -196,7 +201,7 @@
 .match3-board {
   display: grid;
   gap: 5px;
-  width: min(100%, 440px, 52vh);
+  width: min(100%, 440px, 62svh);
   margin: 0 auto;
   padding: 8px;
   border: 3px solid #987b4c;
@@ -385,8 +390,8 @@
 }
 
 @media (max-width: 430px) {
-  .match3-overlay { padding: max(14px, env(safe-area-inset-top)) 8px max(18px, env(safe-area-inset-bottom)); }
-  .match3-card { width: 100%; padding: 13px 11px 11px; border-radius: 19px; }
+  .match3-overlay { padding-right: 3px; padding-left: 3px; }
+  .match3-card { width: 96vw; padding: 13px 11px 11px; border-radius: 19px; }
   .match3-instructions { margin: 7px 0 10px; }
   .match3-subtitle { font-size: .84rem; }
   .match3-board { gap: 3px; padding: 6px; border-radius: 13px; }
@@ -410,8 +415,7 @@
 }
 
 @media (max-width: 350px) {
-  .match3-overlay { padding-right: 3px; padding-left: 3px; }
-  .match3-card { padding: 9px 7px 7px; border-width: 2px; }
+  .match3-card { width: 98vw; padding: 9px 7px 7px; border-width: 2px; }
   .match3-board { gap: 2px; padding: 4px; border-width: 2px; }
   .match3-row { gap: 2px; }
   .match3-tile { border-radius: 5px; }

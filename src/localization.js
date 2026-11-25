@@ -21,6 +21,7 @@ const COPY = {
     noRenovations: 'Hier ist noch alles zu entdecken.', sceneGarden: 'Gartenansicht', sceneVilla: 'Wohnzimmeransicht',
     visitGarden: 'Zum Garten', visitVilla: 'In die Villa', retry: 'Level erneut spielen', close: 'Schließen',
     openRenovation: 'Im Vollbild renovieren', backToEstate: 'Zurück zum Anwesen',
+    closeTasks: 'Aufgaben schließen', openTasks: 'Aufgaben öffnen',
   },
   'pt-BR': {
     title: 'Jardim Particular de Gertrudes Greinwald', tagline: 'Sua casa. Suas escolhas.',
@@ -44,6 +45,7 @@ const COPY = {
     noRenovations: 'Ainda há muito para descobrir por aqui.', sceneGarden: 'Vista do jardim', sceneVilla: 'Vista da sala',
     visitGarden: 'Ir ao jardim', visitVilla: 'Entrar na vila', retry: 'Jogar a fase novamente', close: 'Fechar',
     openRenovation: 'Reformar em tela cheia', backToEstate: 'Voltar à propriedade',
+    closeTasks: 'Fechar tarefas', openTasks: 'Abrir tarefas',
   },
 };
 

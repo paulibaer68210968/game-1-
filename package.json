@@ -8,6 +8,7 @@
   "scripts": {
     "build": "esbuild src/main.js --bundle --format=esm --target=es2020 --outfile=game.bundle.js --minify --legal-comments=external --loader:.ttf=file --loader:.png=file --loader:.jpg=file --loader:.webp=file --asset-names=assets/[name]-[hash] && node scripts/prepare-capacitor.mjs",
     "build:web": "esbuild src/main.js --bundle --format=esm --target=es2020 --outfile=game.bundle.js --minify --legal-comments=external --loader:.ttf=file --loader:.png=file --loader:.jpg=file --loader:.webp=file --asset-names=assets/[name]-[hash]",
+    "test": "node --test",
     "cap": "cap",
     "android:add": "cap add android",
     "android:sync": "cap sync android",

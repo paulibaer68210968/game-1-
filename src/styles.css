@@ -391,8 +391,29 @@ body.is-renovation-fullscreen { overflow: hidden; }
   overscroll-behavior: contain;
   scrollbar-width: thin;
 }
-.fullscreen-panel-grip { width: 36px; height: 4px; margin: 0 auto 10px; border-radius: 99px; background: #c4b99d; }
-.fullscreen-task-panel > :not(.fullscreen-panel-grip) { width: min(100%, 700px); margin-right: auto; margin-left: auto; }
+.fullscreen-panel-toggle {
+  display: flex;
+  width: min(100%, 700px);
+  min-height: 40px;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  margin: 0 auto 7px;
+  padding: 0 12px;
+  border: 1px solid rgba(124, 133, 97, .28);
+  border-radius: 12px;
+  color: #46583f;
+  background: rgba(255, 255, 255, .5);
+  font-size: 12px;
+  font-weight: 850;
+  cursor: pointer;
+  touch-action: manipulation;
+}
+.fullscreen-panel-toggle span { color: #66834e; font: 900 20px/1 system-ui, sans-serif; }
+.fullscreen-task-content { width: min(100%, 700px); margin: 0 auto; }
+.fullscreen-task-panel.is-collapsed { max-height: none; overflow: hidden; padding-bottom: calc(8px + env(safe-area-inset-bottom)); }
+.fullscreen-task-panel.is-collapsed .fullscreen-panel-toggle { margin-bottom: 0; }
+.fullscreen-task-content[hidden] { display: none; }
 .fullscreen-task-panel .task-hint { margin-top: 5px; margin-bottom: 8px; }
 .fullscreen-task-panel .task-list { gap: 6px; }
 .fullscreen-task-panel .renovation-summary { min-height: 52px; }
