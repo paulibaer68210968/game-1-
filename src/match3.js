@@ -285,11 +285,12 @@ export function mountMatch3(container, { level = 1, language = 'de', extraTools 
 
   root.addEventListener('pointerdown', (event) => {
     const tile = event.target.closest?.('.match3-tile');
-    if (!tile) return;
-    pointerStart = { row: Number(tile.dataset.row), col: Number(tile.dataset.col), x: event.clientX, y: event.clientY };
+    if (!tile || pointerStart) return;
+    tile.setPointerCapture?.(event.pointerId);
+    pointerStart = { pointerId: event.pointerId, row: Number(tile.dataset.row), col: Number(tile.dataset.col), x: event.clientX, y: event.clientY };
   });
   root.addEventListener('pointerup', (event) => {
-    if (!pointerStart) return;
+    if (!pointerStart || pointerStart.pointerId !== event.pointerId) return;
     const start = pointerStart;
     pointerStart = null;
     const dx = event.clientX - start.x;
@@ -307,7 +308,9 @@ export function mountMatch3(container, { level = 1, language = 'de', extraTools 
     }
     window.setTimeout(() => { suppressNextClick = false; }, 80);
   });
-  root.addEventListener('pointercancel', () => { pointerStart = null; });
+  root.addEventListener('pointercancel', (event) => {
+    if (pointerStart?.pointerId === event.pointerId) pointerStart = null;
+  });
 
   function translate(key) { return TEXT[locale][key]; }
 
