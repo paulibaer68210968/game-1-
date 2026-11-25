@@ -1,0 +1,9 @@
+{
+  "appId": "com.gertrudesgreinwald.garten",
+  "appName": "Gertrudes Greinwald privater Garten",
+  "webDir": "www",
+  "bundledWebRuntime": false,
+  "android": {
+    "allowMixedContent": false
+  }
+}

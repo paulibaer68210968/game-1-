@@ -1,0 +1,7 @@
+<?xml version='1.0' encoding='utf-8'?>
+<resources>
+    <string name="app_name">Gertrudes Greinwald privater Garten</string>
+    <string name="title_activity_main">Gertrudes Greinwald privater Garten</string>
+    <string name="package_name">com.gertrudesgreinwald.garten</string>
+    <string name="custom_url_scheme">com.gertrudesgreinwald.garten</string>
+</resources>

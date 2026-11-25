@@ -1,49 +1,50 @@
-# Umsetzungsplan: „Gertrudes Greinwald privater Garten“ ohne GDevelop
+# Umsetzungsplan: „Gertrudes Greinwald privater Garten“ – 2D-Mobile-Neuaufbau
 
 ## Genehmigter Umfang
 
-Das bestehende Browser-Spiel wird als eigenständiges Three.js-Spiel neu umgesetzt. GDevelop darf weder zur Laufzeit geladen noch als Projekt-/Exportcode für den Spielstart benötigt werden. Der bestehende Spielumfang bleibt so weit wie möglich erhalten: 3D-Garten, Gartenwichtel, Sammelpfade, Tastatur- und Touchsteuerung, Interaktionen, Shop, Speicherung sowie das Match-3-Minispiel. Die vorhandenen passenden Modelle, Texturen, UI-Bilder, Schrift und der Münz-Sound werden weiterverwendet. Die Wichtel-Wippbewegung wird in die neue Spielerlogik übernommen und bleibt auf Bewegung beschränkt.
+Das bestehende Spiel wird vom frei begehbaren Three.js-Garten auf ein eigenständiges 2D-Match‑3-Garten- und Villenaufbauspiel umgestellt. Die Android-Auslieferung erfolgt als direkt installierbare APK über einen lokalen Capacitor-Android-Wrapper; eine Play-Store-Veröffentlichung ist nicht Teil dieses Umfangs. Die bisherige statische GitHub-Pages-Seite bleibt als Browserfassung erhalten und verwendet denselben Spielclient.
+
+*Gardenscapes* dient ausschließlich als Genre- und Ablaufreferenz: Match‑3-Level geben Sterne, Sterne finanzieren sichtbare Renovierungsschritte. Gertrudes Welt, Wichtel, Texte, Figuren, konkrete Szenen und Oberfläche bleiben eigenständig. Die alte freie 3D-Bewegungssteuerung und der virtuelle Joystick werden aus dem aktiven Spielfluss entfernt. Das Spiel wird für Hochkant-Smartphones gestaltet und ausschließlich durch Tippen und Wischen bedient.
 
 ## Gestaltung
 
-Die vom Nutzer bereitgestellte Referenz dient als Richtung für ein gemütliches, handgemalt wirkendes isometrisches Garten-Dekorationsspiel; Figuren, Layout und konkrete Bilddetails werden nicht kopiert. Der Wechsel betrifft Kamera, Szene und Präsentation, nicht die bereits vorhandenen Spielregeln: Der Wichtel bleibt beweglich und sammelbar, Münzen, Restaurierungen, Shop, Speichern, Sprachen und Match‑3 bleiben Teil des Spiels.
+- **Designbewegung:** gemütliches, isometrisches 2D-Storybook mit klaren, kontrastreichen Pixel-/Kachelmotiven. Die vorhandene warme Gartensprache bleibt als Markenanker erhalten.
+- **Kernprinzipien:** Die 2D-Szene zeigt Fortschritt auf einen Blick; Renovierung ist in kurze, sichtbare Schritte gegliedert; wichtige Aktionen sind mit einer Hand erreichbar; die Spielfläche bleibt frei von übergroßen Bedienelementen.
+- **Farbphilosophie:** Salbeigrün und Blattgrün verbinden die Gartenflächen; warmes Creme und Holz tragen das Anwesen; Bernstein/Gold kennzeichnet Sterne und abgeschlossene Arbeit. Farbvarianten an Wänden und Möbeln zeigen echte Auswahl, nicht bloß Statuswechsel.
+- **Layout-Paradigma:** Hochkant und szenisch statt einer zentralen Bedienfeldwand: kompakte Statusleiste, große 2D-Anwesenansicht, darunter eine schmale Aufgabe-/Belohnungskarte und eine kleine Drei-Ziele-Navigation für Garten, Villa und Match‑3. Das Puzzle selbst bleibt als klar lesbares 8×8-Raster.
+- **Signaturmotive:** Gertrudes Gartentafel mit Blattzeichen; ein verwilderter Garten, der sich sichtbar in ordentliche Beete und Wege verwandelt; warme, wechselbare Wand-/Bodenmuster in der Villa.
+- **Interaktionsphilosophie:** Tippen wählt Szenen, Aufgaben und Dekorationen; Wischen oder Tippen zweier Nachbarsteine tauscht Puzzlefelder. Aktionen zeigen Sternkosten vor dem Ausgeben. Keine Tastatur, Maus, Joystick, Herzen, Echtgeldkäufe oder erzwungene langen Dialoge.
+- **Animation:** kurze, klare Übergänge für Match-Auflösung und Kaskaden; Pflanzen dürfen dezent wippen; Renovierung verändert einzelne Szenenteile mit kurzem Einblenden. Bewegung reduziert sich bei `prefers-reduced-motion`.
+- **Typografie:** gut lesbare System-Serif für Erzählton und Überschriften; system-ui für Zahlen, Status und kleine Beschriftungen. Die vorhandene Caesar-Dressing-Schrift bleibt höchstens als kurzer Markenakzent.
+- **Markenessenz:** ein kleines, warmherziges Anwesen, das Spielerinnen und Spieler durch Rätselerfolge Zimmer und Garten Stück für Stück selbst gestalten lässt; Persönlichkeit: herzlich, verspielt, behaglich.
+- **Markensprache:** kurze, konkrete und ermutigende deutsche Texte; brasilianisches Portugiesisch bleibt als zweite Sprache verfügbar. Beispiele: „Ein Stern, ein neuer Winkel fürs Zuhause.“ und „Der Wintergarten wartet schon auf seine Blumen.“
+- **Wortmarke/Logo:** kompakte Gartentafel mit Blatt-/Fenstersymbol, eigener Name in der vorhandenen Markenfamilie.
+- **Signaturfarbe:** sattes Salbeiblattgrün.
 
-- **Designbewegung:** märchenhaftes, isometrisches Storybook-Gartenspiel mit leicht plastischen 3D-Modellen und sanft gemalten Materialfarben.
-- **Kernprinzipien:** üppig und kurvig statt technisch-geradlinig; warme und natürliche Materialien; Dekorationen und Interaktionen auf den ersten Blick erkennbar; UI bleibt auf Touchflächen gut bedienbar.
-- **Farbphilosophie:** Salbeigras und Blattgrün vermitteln Ruhe; gepflasterte Wege, Terrakotta und Holz wärmen die Szene; cremefarbene Papierflächen mit goldenen Münz-/Sternakzenten geben der Auswahl eine gemütliche Buchillustrations-Anmutung.
-- **Layout-Paradigma:** fest ausgerichtete orthografische Isometrie, die dem Wichtel folgt; Status- und Markenplakette oben, Gartenfläche als Hauptmotiv, gut sichtbare Dekorationsleiste am unteren Bildschirmrand. Drag/Zoom darf den Blickwinkel begrenzt anpassen.
-- **Signaturmotive:** warme unregelmäßige Steinplatten auf geschwungenen Wegen; kleine Blüten- und Beetakzente; cremefarbene, abgerundete Plaketten mit blattgrünen Knöpfen und Münzgold.
-- **Interaktionsphilosophie:** Jede Aktion erklärt Kosten und Effekt direkt; Shop, Restaurierung und Platzieren bleiben ohne Verlust des Spielfortschritts erreichbar; Touchflächen werden nicht von der Dekorationsleiste überdeckt.
-- **Animation:** Wichtel wippt nur während geerdeter Bewegung; Münzen schweben dezent; UI reagiert weich und kurz, ohne fortlaufend abzulenken.
-- **Typografie:** „Caesar Dressing“ nur für Markenakzent/Überschriften, Georgia oder System-Serif für Status, Schaltflächen und längere Texte.
-- **Markenessenz:** ein privater Märchengarten, den man beim Erkunden Stück für Stück wieder zum Leben erweckt; Persönlichkeit: herzlich, verspielt, behaglich.
-- **Markensprache:** freundlich, konkret, ermutigend. Beispiele: „Ein neuer Winkel für den Garten“ und „Noch ein Stern – und der Brunnen sprudelt wieder.“
-- **Wortmarke/Logo:** Name in einer kleinen, cremefarbenen Gartentafel mit stilisiertem Blatt-/Blütenzeichen, nicht als nackter Standardschriftzug.
-- **Signaturfarbe:** sattes Salbeiblattgrün, aus dem sich Schaltflächen und UI-Rahmen ableiten.
+## Kernschleife und Fortschritt
 
-Die Wichtelfigur erhält weiterhin eine weiche Laufwippe nur während geerdeter Bewegung; animiert wird ausschließlich der sichtbare Modellknoten, während Physik-/Kamerawurzel stabil bleiben.
+1. Eine Levelübersicht beziehungsweise der Anwesen-Bildschirm zeigt den nächsten Match‑3-Level und mehrere erreichbare Renovierungsaufgaben.
+2. Ein erfolgreiches Match‑3 bringt Sterne; ein fehlgeschlagenes Level kann ohne Echtgeld-/Energiezwang wiederholt werden.
+3. Sterne werden für Villa- und Gartenaufgaben ausgegeben. Die Aufgaben decken mindestens Wege/Beete/Pflanzen im Garten sowie Wandgestaltung/Tapeten und Möbel im Haus ab.
+4. Wo es sinnvoll ist, wählt der Spieler oder die Spielerin für eine Renovierung eine von bis zu drei rein kosmetischen Varianten. Die Wahl verändert die sichtbare 2D-Szene und wird gespeichert.
+5. Die Werkstatt beziehungsweise das Gartenschuppen-Upgrade kann einen begrenzten Werkzeugvorrat für Match‑3 freischalten. Bestehende Schaufel-/Gießkannen-Booster bleiben als zugfreie, limitierte Hilfen erhalten; keine Monetarisierung wird ergänzt.
 
-## Architektur und Datenfluss
+## Architektur und Projektstruktur
 
-- Eigenständiger Browser-Start über `index.html` und eigene ES-Module unter `src/`; keine GDevelop-Skripte, kein `gdjs.RuntimeGame`, kein GDevelop-Eventcode als Runtime.
-- Three.js für 3D-Darstellung, GLTF-Import, Kamera und Raycasting; eine kleine eigenständige Physik-/Kollisionsschicht übernimmt Bewegung, Sprung, Hindernisse und die schiebbare Kiste. Zusätzliche Physik wird nur genutzt, falls die bestehende Kollisionslogik es erfordert.
-- Projektcode wird lokal und reproduzierbar gebündelt, damit GitHub Pages weiterhin statische Dateien vom bestehenden Repository-Root ausliefern kann. Laufzeitcode und Modelle werden ohne CDN-Abhängigkeit ausgeliefert.
-- Aus den GDevelop-Exportdaten werden nur benötigte Positions-, Terrain-, Streu- und UI-Werte in ein neutrales eigenes Format übertragen. Einmalige Extraktion ist erlaubt; die fertige Anwendung lädt `data.js`, `code0.js`, `code1.js` oder GDevelop-Extensions nicht.
-- Die vorhandenen Weltkoordinaten sind Z-up. Die Three.js-Welt behält eine eindeutige Achsenkonvention; GLB-Modelle erhalten eine feste Korrektur am Wrapper statt laufender Einzelkorrekturen.
-- Hauptmodule: Start/Renderloop, Garten/Terrain und dekorative Streuung, Spieler/Steuerung/Kamera, Interaktionen, HUD/Touch/Sprachen, lokale Speicherung und Match-3.
+- `index.html` bleibt der Browser-Einstieg im Repository-Root. GitHub Pages serviert weiterhin statische Dateien; keine GDevelop-Runtime und kein CDN sind zur Laufzeit erforderlich.
+- `src/main.js` startet das 2D-Spiel und verbindet Oberfläche, Spielstand, Navigation und Match‑3. `src/garden.js` rendert die auswählbare isometrische Anwesen-/Zimmeransicht. `src/progression.js` enthält Renovierungsaufgaben, Sternkosten, Varianten und Fortschrittshelfer; `src/main.js` liest, migriert und speichert den lokalen Fortschritt. `src/localization.js` hält deutsche und brasilianisch-portugiesische Texte. `src/match3.js` behält die Match‑3-Regeln und ergänzt den integrierten Level-/Belohnungsfluss.
+- `src/styles.css` und `src/match3.css` definieren die responsive Hochkant-Oberfläche, Safe-Area-Abstände und Touch-Eingabe. Buttons sind optisch kompakt und besitzen weiterhin ausreichende Touchflächen.
+- `assets/2d/` enthält ausschließlich tatsächlich verwendete, lizenzierte Sprites/Tiles; `ASSET_CREDITS.md` hält Quelle, Assetnamen und jeweilige Lizenz fest. Die Szenen kombinieren eigene CSS-gezeichnete Dioramen mit ausgewählten CC0-2D-Sprites aus Pixor-Pflanzen-, Natur-, Innenraum- und Werkzeugpaketen; keine Screaming-Brain-Tiles sind eingebunden.
+- `capacitor.config.json` und `android/` enthalten die Capacitor-Konfiguration und das native Android-Projekt. `www/` wird beim Build aus dem Browser-Build erzeugt und nicht als zweite manuell gepflegte Spielcodekopie behandelt. `scripts/prepare-capacitor.mjs` übernimmt nur vom gebündelten Client referenzierte Assetdateien.
+- Capacitor verpackt den bestehenden statischen Webclient lokal für Android. Es werden keine Remote-Webseiten geladen; dadurch bleibt die App offline spielbar und nutzt dieselbe lokale Speicherung.
 
-## Zu erhaltende Spielinhalte
+## Speicherung, Kompatibilität und Datenschutz
 
-1. **3D-Garten:** das Garten-Terrain mit Gras-/Weg-/Fels-/Sand-Charakter, Wasserfläche, hellem Gartenhintergrund und warmem Licht; gepflasterte Wege und ergänzte Blumenbeete; der Gartenwichtel als Spielfigur; Brunnen, Bank, Schild, Garten-Dekoration, Vegetationsstreuung, vier Markierungsflaggen, 45 Münzen, Hindernisse und Kartengrenzen. Die Ausgangsanordnung und Münzpositionen werden aus dem Export in neutrale Laufzeitdaten übertragen.
-2. **Steuerung:** Desktop mit WASD und Leertaste zum Springen, Touch mit virtuellem Joystick und Sprungtaste, Umschalter zwischen Steuerungsarten, sowie isometrische Orthografiekamera, die dem Wichtel folgt und per Maus-/Touchbedienung begrenzt dreh- und zoombar bleibt.
-3. **Gartenmechaniken:** Münzen sammeln und Sound abspielen; Schild öffnet Match-3; Sterne und Gartenlevel im HUD; Brunnen und Bank mit Sternen restaurieren; Stern-Shop für Beet, Statue, Laterne und Gnom; gekaufte Objekte per Boden-Raycaster platzieren. Sprache Deutsch/Brasilianisches Portugiesisch und Spielstand bleiben im Browser gespeichert.
-4. **Match-3:** 8×8-Feld mit fünf Farben, Tausch benachbarter Steine, Match-Auflösung/Kaskaden und Nachrücken, Ziel-/Zugzähler, Level-Farbfolge, Sternbelohnung, Erfolg/Niederlage und Rückkehr in den Garten. Vierer-Matches erzeugen eine Zeilen- oder Spaltenrakete, Fünfer-Matches einen Regenbogenstein und L-/T-Kreuzungen eine Blumenbombe; diese Muster erzeugen auch in Nachrück-Kaskaden Spezialsteine. Aktivierte Spezialsteine lösen Ketteneffekte aus. Zwei Gartenschaufeln (entfernen ein Feld) und eine Gießkanne (räumt ein 3×3-Feld) stehen pro Match-Instanz als limitierte, zugfreie Booster zur Verfügung und bleiben auch bei null verbleibenden Zügen nutzbar. Zielsteine, die durch Spezialeffekte oder Booster abgeräumt werden, zählen zum Levelziel. Spezialsteine, Boosterzustand, Erklärungen und Effekte funktionieren auf Deutsch und brasilianischem Portugiesisch; Nachbarzüge sind per Tipp/Klick und Wisch möglich.
-5. **Wichtelanimation:** dezente vertikale Wippe plus leichte Seitbewegung nur während geerdeter Bewegung; im Stillstand vollständig beruhigt, beim Springen nicht als Laufanimation aktiv; keine Änderung der Kollisions- oder Kamerawurzel.
+- Der Spielstand bleibt lokal im Browser/WebView gespeichert; Konto, Backend, Analyse-SDKs und Online-Pflicht sind nicht Teil des Umfangs.
+- Vorhandene Werte aus `gertrudes-greinwald-garden-save-v1` werden, soweit sinnvoll, in die neue Fortschrittsstruktur migriert. Sterne, Match‑3-Level und Sprache bleiben erhalten; abgeschlossene alte Restaurierungen werden nicht stillschweigend gelöscht.
+- Deutsch und brasilianisches Portugiesisch sowie Match‑3-Spezialsteine, limitierte Booster, Kaskaden und Levelziel bleiben erhalten.
+- Die Android-App startet mit festem Hochkantformat. Die vorhandene Browserfassung funktioniert weiter auf Smartphone und Tablet, ohne Maus-/Tastatur- oder Joystick-Anforderung.
 
-## Umsetzung und Übergabe
+## Auslieferung
 
-Die statische Pages-Auslieferung im Repository-Root bleibt bestehen; die GitHub-Pages-Konfiguration wird nicht ohne Not umgestellt. Nach Umsetzung werden GDevelop-Runtime, Erweiterungen und generierter App-Code, die für die eigenständige Version nicht mehr benötigt werden, aus dem aktiven Projektbestand entfernt; alle tatsächlich verwendeten Spiel-Assets bleiben erhalten. Vor dem Push werden Build, Script-/Assetpfade, beide Spielmodi, Steuerung, Speichern und Abwesenheit von GDevelop-Laufzeitreferenzen geprüft. Anschließend werden die Änderungen auf `main` gepusht und die veröffentlichte Seite auf den neuen Start geprüft.
-
-## Risiken und Grenzen
-
-GDevelops Terrain- und Scatter-Plugins enthalten serialisierte Bearbeitungen. Diese müssen in eigene Mesh-/Höhen-/Streu-Daten übersetzt werden; Plugin-Code wird nicht übernommen. Die Zielsetzung ist eine möglichst nahe spielbare Reproduktion, keine bytegenaue Reproduktion der GDevelop-Renderergebnisse. Unveränderte visuelle Details werden nur dann angepasst, wenn es für eine lauffähige, eigenständige Umsetzung nötig ist.
+Ein reproduzierbarer `pnpm build` erzeugt den Browser-Build und bereitet dieselben statischen Dateien für Capacitor vor. Das Android-Projekt wird mit Capacitor synchronisiert; wenn das Android-SDK verfügbar ist, wird eine installierbare Debug-APK gebaut. Eine Debug-APK ist nicht für einen Play-Store-Release signiert. Ein APK-Artefakt wird nur dann als fertig bezeichnet, wenn der Android-Build tatsächlich erfolgreich war.

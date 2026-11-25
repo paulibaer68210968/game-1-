@@ -1,3 +1,5 @@
+import { ART } from './art.js';
+
 const SIZE = 8;
 const START_MOVES = 20;
 const COLORS = ['Red', 'Blue', 'Green', 'Yellow', 'Purple'];
@@ -35,6 +37,7 @@ const TEXT = {
     shovelUsed: 'Ein Stein wurde mit der Schaufel entfernt.', wateringUsed: 'Die Gießkanne hat ein 3×3-Feld freigeräumt.', boosterCancel: 'Booster abgewählt. Wähle zwei benachbarte Steine.',
     specialCreated: (name) => `${name} gebildet! Beim Auslösen kann sie weitere Steine mitreißen.`,
     specialActivated: 'Spezialstein ausgelöst – die Kettenreaktion läuft!', noMovesBoosters: 'Keine Züge mehr – setze deine verbleibenden Booster ein!',
+    continueGarden: 'Zurück zum Garten', retry: 'Noch einmal spielen',
   },
   'pt-BR': {
     levelLabel: 'Nível',
@@ -51,6 +54,7 @@ const TEXT = {
     shovelUsed: 'Uma pedra foi removida com a pá.', wateringUsed: 'O regador limpou uma área de 3×3.', boosterCancel: 'Impulso cancelado. Escolha duas pedras vizinhas.',
     specialCreated: (name) => `${name} criada! Ao ativar, ela pode causar novas reações.`,
     specialActivated: 'Gema especial ativada — as reações em cadeia começaram!', noMovesBoosters: 'As jogadas acabaram — use os impulsos restantes!',
+    continueGarden: 'Voltar ao jardim', retry: 'Jogar novamente',
   },
 };
 
@@ -170,7 +174,7 @@ function specialCreatedBy(runs, board, first = null, second = null) {
   return { ...position, gem: makeGem(gem.color, special) };
 }
 
-export function mountMatch3(container, { level = 1, language = 'de', onBack = () => {}, onReward = () => {} } = {}) {
+export function mountMatch3(container, { level = 1, language = 'de', extraTools = false, onBack = () => {}, onReward = () => {} } = {}) {
   if (!container || typeof container.appendChild !== 'function') {
     throw new TypeError('mountMatch3 requires a DOM container.');
   }
@@ -187,8 +191,8 @@ export function mountMatch3(container, { level = 1, language = 'de', onBack = ()
   let finished = false;
   let destroyed = false;
   let armedBooster = null;
-  const boosterCharges = { shovel: 2, watering: 1 };
-  let returnTimer = null;
+  const boosterBase = { shovel: extraTools ? 3 : 2, watering: extraTools ? 2 : 1 };
+  const boosterCharges = { ...boosterBase };
 
   const root = document.createElement('section');
   root.className = 'match3-overlay';
@@ -217,15 +221,18 @@ export function mountMatch3(container, { level = 1, language = 'de', onBack = ()
       <section class="match3-booster-panel" aria-label="">
         <strong class="match3-booster-title"></strong>
         <div class="match3-booster-list">
-          <button class="match3-booster" data-booster="shovel" type="button"><span class="match3-booster-icon" aria-hidden="true">⌁</span><span class="match3-booster-copy"><b></b><small></small></span></button>
-          <button class="match3-booster" data-booster="watering" type="button"><span class="match3-booster-icon" aria-hidden="true">✿</span><span class="match3-booster-copy"><b></b><small></small></span></button>
+          <button class="match3-booster" data-booster="shovel" type="button"><span class="match3-booster-icon" aria-hidden="true"><img class="match3-tool-icon match3-tool-shovel" alt=""></span><span class="match3-booster-copy"><b></b><small></small></span></button>
+          <button class="match3-booster" data-booster="watering" type="button"><span class="match3-booster-icon" aria-hidden="true"><img class="match3-tool-icon match3-tool-watering" alt=""></span><span class="match3-booster-copy"><b></b><small></small></span></button>
         </div>
       </section>
       <p class="match3-hint" aria-live="polite" aria-atomic="true"></p>
+      <div class="match3-result-actions"><button class="match3-result-button" type="button" hidden></button></div>
     </div>`;
   container.appendChild(root);
 
   const $ = (selector) => root.querySelector(selector);
+  $('.match3-tool-shovel').src = ART.shovel;
+  $('.match3-tool-watering').src = ART.wateringCan;
   const boardElement = $('.match3-board');
   const statusElement = $('.match3-hint');
   const movesElement = $('.match3-moves-value');
@@ -332,6 +339,7 @@ export function mountMatch3(container, { level = 1, language = 'de', onBack = ()
     $('.match3-guide-title').textContent = text.powersTitle;
     $('.match3-booster-panel').setAttribute('aria-label', text.boostersTitle);
     $('.match3-booster-title').textContent = text.boostersTitle;
+    if (finished) $('.match3-result-button').textContent = root.classList.contains('match3-won') ? text.continueGarden : text.retry;
     const icons = { row: '↔', column: '↕', bomb: '✿', rainbow: '✧' };
     $('.match3-power-list').replaceChildren();
     for (const kind of ['row', 'column', 'bomb', 'rainbow']) {
@@ -575,17 +583,34 @@ export function mountMatch3(container, { level = 1, language = 'de', onBack = ()
     refreshBoard();
     statusElement.textContent = won ? TEXT[locale].win : TEXT[locale].lose;
     root.classList.add(won ? 'match3-won' : 'match3-lost');
-    returnTimer = window.setTimeout(() => {
-      if (!destroyed) onBack();
-    }, 2000);
+    const resultButton = $('.match3-result-button');
+    resultButton.textContent = won ? TEXT[locale].continueGarden : TEXT[locale].retry;
+    resultButton.hidden = false;
     if (won) onReward({ level: safeLevel, nextLevel: safeLevel + 1 });
   }
 
   $('.match3-back').addEventListener('click', () => {
     if (finished || destroyed) return;
     finished = true;
-    if (returnTimer !== null) window.clearTimeout(returnTimer);
     onBack();
+  });
+  $('.match3-result-button').addEventListener('click', () => {
+    if (destroyed || !finished) return;
+    if (root.classList.contains('match3-won')) { onBack(); return; }
+    board = ORIGINAL_BOARD.map((row) => row.map((color) => makeGem(color)));
+    movesLeft = START_MOVES;
+    collected = 0;
+    selected = null;
+    busy = false;
+    finished = false;
+    armedBooster = null;
+    boosterCharges.shovel = boosterBase.shovel;
+    boosterCharges.watering = boosterBase.watering;
+    root.classList.remove('match3-won', 'match3-lost');
+    $('.match3-result-button').hidden = true;
+    statusElement.textContent = TEXT[locale].hint;
+    refreshBoard();
+    updateCounters();
   });
   boosterButtons.shovel.addEventListener('click', () => selectBooster('shovel'));
   boosterButtons.watering.addEventListener('click', () => selectBooster('watering'));
@@ -598,7 +623,6 @@ export function mountMatch3(container, { level = 1, language = 'de', onBack = ()
   function destroy() {
     if (destroyed) return;
     destroyed = true;
-    if (returnTimer !== null) window.clearTimeout(returnTimer);
     root.remove();
   }
 

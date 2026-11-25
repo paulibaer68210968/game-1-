@@ -379,3 +379,18 @@
     transition-duration: .01ms !important;
   }
 }
+
+.match3-tool-icon { display: block; width: 28px; height: 28px; object-fit: contain; image-rendering: pixelated; }
+.match3-result-actions { display: flex; min-height: 42px; justify-content: center; margin-top: 4px; }
+.match3-result-button { min-height: 42px; padding: 8px 18px; border: 1px solid #557447; border-radius: 12px; color: #fff9e8; background: linear-gradient(145deg, #829b68, #4e7045); box-shadow: 0 3px 0 #3f603a; font: 800 .86rem/1 system-ui, sans-serif; cursor: pointer; touch-action: manipulation; }
+.match3-result-button:active { transform: translateY(2px); box-shadow: 0 1px 0 #3f603a; }
+.match3-result-button:focus-visible { outline: 3px solid #a66b16; outline-offset: 2px; }
+.match3-result-button[hidden] { display: none; }
+
+@media (max-height: 760px) {
+  .match3-overlay { align-items: start; padding-top: max(8px, env(safe-area-inset-top)); padding-bottom: max(8px, env(safe-area-inset-bottom)); }
+  .match3-card { padding-top: 10px; padding-bottom: 8px; }
+  .match3-subtitle { margin: 7px 0 9px; }
+  .match3-power-guide, .match3-booster-panel { margin-top: 7px; }
+  .match3-hint { min-height: 1.6em; margin-top: 7px; }
+}
