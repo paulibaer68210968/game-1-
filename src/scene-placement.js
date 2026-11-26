@@ -1,6 +1,7 @@
 export const SCENE_POSITION_MIN = 4;
 export const SCENE_POSITION_MAX = 96;
 export const SCENE_PAN_LIMIT = 0.15;
+export const VILLA_PAN_LIMIT = 0.42;
 
 export function clampScenePosition(value, fallback = 50) {
   const number = Number(value);
@@ -16,22 +17,24 @@ export function pointOnScene(clientX, clientY, rect) {
   };
 }
 
-export function panScene(startPan, deltaX, deltaY, width, height) {
+export function panScene(startPan, deltaX, deltaY, width, height, limit = SCENE_PAN_LIMIT) {
   const safeWidth = Math.max(1, Number(width) || 1);
   const safeHeight = Math.max(1, Number(height) || 1);
-  const startX = Math.max(-SCENE_PAN_LIMIT, Math.min(SCENE_PAN_LIMIT, Number(startPan?.x) || 0));
-  const startY = Math.max(-SCENE_PAN_LIMIT, Math.min(SCENE_PAN_LIMIT, Number(startPan?.y) || 0));
+  const range = Math.max(0, Math.abs(Number(limit) || SCENE_PAN_LIMIT));
+  const startX = Math.max(-range, Math.min(range, Number(startPan?.x) || 0));
+  const startY = Math.max(-range, Math.min(range, Number(startPan?.y) || 0));
   return {
-    x: Math.max(-SCENE_PAN_LIMIT, Math.min(SCENE_PAN_LIMIT, startX + deltaX / safeWidth)),
-    y: Math.max(-SCENE_PAN_LIMIT, Math.min(SCENE_PAN_LIMIT, startY + deltaY / safeHeight)),
+    x: Math.max(-range, Math.min(range, startX + deltaX / safeWidth)),
+    y: Math.max(-range, Math.min(range, startY + deltaY / safeHeight)),
   };
 }
 
-export function normalizeScenePan(value = {}) {
+export function normalizeScenePan(value = {}, limit = SCENE_PAN_LIMIT) {
+  const range = Math.max(0, Math.abs(Number(limit) || SCENE_PAN_LIMIT));
   const clamp = (entry) => {
     const number = Number(entry);
     if (!Number.isFinite(number)) return 0;
-    return Math.max(-SCENE_PAN_LIMIT, Math.min(SCENE_PAN_LIMIT, number));
+    return Math.max(-range, Math.min(range, number));
   };
   return { x: clamp(value.x), y: clamp(value.y) };
 }

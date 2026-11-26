@@ -11,6 +11,7 @@ import {
 } from '../src/progression.js';
 import {
   SCENE_PAN_LIMIT,
+  VILLA_PAN_LIMIT,
   clampScenePosition,
   normalizeScenePan,
   panScene,
@@ -86,4 +87,10 @@ test('scene panning is normalized and clamped to a reachable range', () => {
   assert.deepEqual(panScene({ x: 0, y: 0 }, 100, -50, 1000, 500), { x: 0.1, y: -0.1 });
   assert.deepEqual(panScene({ x: 0.14, y: -0.14 }, 500, -500, 1000, 1000), { x: SCENE_PAN_LIMIT, y: -SCENE_PAN_LIMIT });
   assert.deepEqual(normalizeScenePan({ x: 4, y: -4 }), { x: SCENE_PAN_LIMIT, y: -SCENE_PAN_LIMIT });
+});
+
+test('villa navigation has an expanded pan range without changing the garden range', () => {
+  assert.deepEqual(panScene({ x: 0, y: 0 }, 1000, -1000, 1000, 1000), { x: SCENE_PAN_LIMIT, y: -SCENE_PAN_LIMIT });
+  assert.deepEqual(panScene({ x: 0, y: 0 }, 1000, -1000, 1000, 1000, VILLA_PAN_LIMIT), { x: VILLA_PAN_LIMIT, y: -VILLA_PAN_LIMIT });
+  assert.deepEqual(normalizeScenePan({ x: 0.8, y: -0.8 }, VILLA_PAN_LIMIT), { x: VILLA_PAN_LIMIT, y: -VILLA_PAN_LIMIT });
 });

@@ -497,3 +497,11 @@ body.is-renovation-fullscreen { overflow: hidden; }
 @media (prefers-reduced-motion: reduce) {
   .renovation-sprite { transition: none; }
 }
+
+/* Villa-only navigation: use a larger scene stage so touch swipes can traverse the room. */
+.fullscreen-scene-canvas .diorama-villa.is-pannable {
+  top: -40svh;
+  left: -40vw;
+  width: 180vw;
+  height: 180svh;
+}

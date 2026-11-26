@@ -6,7 +6,7 @@ import { copyFor, localized } from './localization.js';
 import { ART } from './art.js';
 import { decorationsForArea, getDecoration } from './decorations.js';
 import { applyRenovation, initialVariant, isRenovated, tasksForArea } from './progression.js';
-import { clampScenePosition, normalizeScenePan, panScene, pointOnScene } from './scene-placement.js';
+import { clampScenePosition, normalizeScenePan, panScene, pointOnScene, VILLA_PAN_LIMIT } from './scene-placement.js';
 
 const SAVE_KEY = 'gertrudes-greinwald-garden-save-v2';
 const LEGACY_SAVE_KEY = 'gertrudes-greinwald-garden-save-v1';
@@ -54,7 +54,7 @@ function normalizedSave(value = {}) {
     },
     scenePan: {
       garden: normalizeScenePan(value.scenePan?.garden),
-      villa: normalizeScenePan(value.scenePan?.villa),
+      villa: normalizeScenePan(value.scenePan?.villa, VILLA_PAN_LIMIT),
     },
     legacyDecor: Array.isArray(value.legacyDecor) ? value.legacyDecor : [],
   };
@@ -265,7 +265,8 @@ function renderFullscreen(copy, currentIsGarden) {
   renderGardenScene(appRoot.querySelector('#fullscreenSceneCanvas'), save, save.language);
   const scene = appRoot.querySelector('.fullscreen-scene-canvas .diorama');
   if (scene) {
-    const pan = normalizeScenePan(save.scenePan[save.activeScene]);
+    const panLimit = save.activeScene === 'villa' ? VILLA_PAN_LIMIT : undefined;
+    const pan = normalizeScenePan(save.scenePan[save.activeScene], panLimit);
     scene.style.setProperty('--scene-pan-x', `${pan.x * window.innerWidth}px`);
     scene.style.setProperty('--scene-pan-y', `${pan.y * window.innerHeight}px`);
     attachSceneGestures(appRoot.querySelector('#fullscreenSceneCanvas'), scene);
@@ -323,7 +324,8 @@ function attachSceneGestures(canvas, stage) {
       gesture.movable.classList.add('is-being-moved');
       gesture.point = point;
     } else {
-      gesture.pan = panScene(gesture.startPan, dx, dy, window.innerWidth, window.innerHeight);
+      const panLimit = save.activeScene === 'villa' ? VILLA_PAN_LIMIT : undefined;
+      gesture.pan = panScene(gesture.startPan, dx, dy, window.innerWidth, window.innerHeight, panLimit);
       stage.style.setProperty('--scene-pan-x', `${gesture.pan.x * window.innerWidth}px`);
       stage.style.setProperty('--scene-pan-y', `${gesture.pan.y * window.innerHeight}px`);
     }
